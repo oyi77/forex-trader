@@ -1,0 +1,22 @@
+# Configuration for the AI-driven trading engine
+
+# API Keys (replace with your actual keys)
+BINANCE_API_KEY: "your_binance_api_key"
+BINANCE_API_SECRET: "your_binance_api_secret"
+OANDA_API_KEY: "your_oanda_api_key"
+OANDA_ACCOUNT_ID: "your_oanda_account_id"
+
+# Trading Parameters
+DEFAULT_TIMEFRAMES: ["H1", "M30"]
+RISK_PER_TRADE: 0.01 # 1% of equity
+MAX_DRAWDOWN_PERCENT: 0.05 # 5% max drawdown before pausing trading
+
+# Telegram Alerts (optional)
+TELEGRAM_BOT_TOKEN: "your_telegram_bot_token"
+TELEGRAM_CHAT_ID: "your_telegram_chat_id"
+
+# News Calendar API (optional)
+NEWS_API_KEY: "your_news_api_key"
+NEWS_API_URL: "https://some_news_api.com/v1/calendar"
+
+
