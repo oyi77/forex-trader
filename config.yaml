@@ -1,93 +1,70 @@
-# Forex Trading Bot Configuration
-
-# API Keys (replace with your actual keys)
-BINANCE_API_KEY: "your_binance_api_key"
-BINANCE_API_SECRET: "your_binance_api_secret"
-OANDA_API_KEY: "your_oanda_api_key"
-OANDA_ACCOUNT_ID: "your_oanda_account_id"
-
-# Exness MT5 Configuration (for forex trading)
-EXNESS_LOGIN: "your_exness_login"
-EXNESS_PASSWORD: "your_exness_password"
-EXNESS_SERVER: "Exness-MT5"  # or "Exness-MT5-Demo" for demo account
-
-# Financial Modeling Prep API Key
-FMP_API_KEY: "8Z3mPEMSUcT9GiZmmgGcnDBIZloylElz"
-
-# Trading Configuration
-initial_balance: 1000000.0
-leverage: 2000
-risk_per_trade: 0.6
-max_positions: 20
-max_drawdown_threshold: 0.8
-commission_rate: 0.00005
-slippage_rate: 0.0003
-take_profit_ratio: 2.0
-
-# Data and Execution
-data_provider: YAHOO
-execution_engine: EXTREME
-log_level: INFO
-
-# Features
-extreme_mode: true
-martingale_enabled: true
-scalping_enabled: true
-news_trading_enabled: true
-enable_dashboard: true
-enable_notifications: true
-
-# Position Sizing
-position_sizing_method: FIXED_PERCENTAGE
-stop_loss_method: ATR
-
-# Forex Trading Parameters
-FOREX_SYMBOLS: ["EURUSD", "GBPUSD", "USDJPY", "USDCHF", "AUDUSD", "USDCAD", "NZDUSD"]
+BINANCE_API_KEY: your_binance_api_key
+BINANCE_API_SECRET: your_binance_api_secret
+DEMO_MODE: true
+EXCHANGE: exness
+EXNESS_LOGIN: your_exness_login
+EXNESS_PASSWORD: your_exness_password
+EXNESS_SERVER: Exness-MT5
+FMP_API_KEY: 8Z3mPEMSUcT9GiZmmgGcnDBIZloylElz
 FOREX_LOT_SIZE: 0.01
 FOREX_SPREAD_LIMIT: 50
-
-# Trading Strategies
-strategies:
-  - name: Scalper_1
-    type: EXTREME_SCALPING
-    timeframe: 1m
-    confidence_threshold: 0.95
-    max_holding_minutes: 1
-  - name: News_Trader_1
-    type: NEWS_EXPLOSION
-    news_impact_threshold: HIGH
-    reaction_time_seconds: 3
-  - name: Momentum_1
-    type: BREAKOUT_MOMENTUM
-    momentum_threshold: 0.03
-    volume_confirmation: true
-  - name: Recovery_1
-    type: MARTINGALE_EXTREME
-    max_levels: 8
-    recovery_target: 0.1
-
-strategy_weights:
-  Scalper_1: 0.4
-  News_Trader_1: 0.3
-  Momentum_1: 0.2
-  Recovery_1: 0.1
-
-# Risk Management
+FOREX_SYMBOLS:
+- EURUSD
+- GBPUSD
+- USDJPY
+- USDCHF
+- AUDUSD
+- USDCAD
+- NZDUSD
 MAX_CONSECUTIVE_LOSSES: 5
-MIN_WIN_RATE: 0.3
 MIN_CONFIDENCE: 70
-
-# Telegram Alerts (optional)
-TELEGRAM_BOT_TOKEN: "your_telegram_bot_token"
-TELEGRAM_CHAT_ID: "your_telegram_chat_id"
-
-# Trading Schedule
+MIN_WIN_RATE: 0.3
+OANDA_ACCOUNT_ID: your_oanda_account_id
+OANDA_API_KEY: your_oanda_api_key
+TELEGRAM_BOT_TOKEN: your_telegram_bot_token
+TELEGRAM_CHAT_ID: your_telegram_chat_id
 TRADING_HOURS:
-  start: "00:00"
-  end: "23:59"
-
-# Exchange Settings
-EXCHANGE: "exness"
-DEMO_MODE: true
-
-
+  end: '23:59'
+  start: 00:00
+commission_rate: 5.0e-05
+data_provider: YAHOO
+enable_dashboard: true
+enable_notifications: true
+execution_engine: EXTREME
+extreme_mode: true
+initial_balance: 1000000.0
+leverage: 2000
+log_level: INFO
+martingale_enabled: true
+max_drawdown_threshold: 0.8
+max_positions: 20
+news_trading_enabled: true
+position_sizing_method: FIXED_PERCENTAGE
+risk_per_trade: 0.6
+scalping_enabled: true
+slippage_rate: 0.0003
+stop_loss_method: ATR
+strategies:
+- confidence_threshold: 0.95
+  max_holding_minutes: 1
+  name: Scalper_1
+  timeframe: 1m
+  type: EXTREME_SCALPING
+- name: News_Trader_1
+  news_impact_threshold: HIGH
+  reaction_time_seconds: 3
+  type: NEWS_EXPLOSION
+- momentum_threshold: 0.03
+  name: Momentum_1
+  type: BREAKOUT_MOMENTUM
+  volume_confirmation: true
+- max_levels: 8
+  name: Recovery_1
+  recovery_target: 0.1
+  type: MARTINGALE_EXTREME
+strategy_weights:
+  Momentum_1: 0.2
+  News_Trader_1: 0.3
+  Recovery_1: 0.1
+  Scalper_1: 0.4
+take_profit_ratio: 2.0

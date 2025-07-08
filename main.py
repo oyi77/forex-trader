@@ -131,6 +131,7 @@ class ForexTradingBot:
     def _initialize_strategies(self, config, mode: str) -> None:
         """Initialize trading strategies using factory"""
         if mode == "extreme":
+            from src.factories.strategy_factory import get_extreme_strategy_factory
             factory = get_extreme_strategy_factory()
         else:
             factory = get_strategy_factory()
@@ -143,9 +144,20 @@ class ForexTradingBot:
         
         for strategy_config in strategies_config:
             try:
+                # Map extreme strategy types to base types if using regular factory
+                if mode != "extreme" and strategy_config['type'] in ['EXTREME_SCALPING', 'NEWS_EXPLOSION', 'BREAKOUT_MOMENTUM', 'MARTINGALE_EXTREME']:
+                    # Map to base strategy types
+                    type_mapping = {
+                        'EXTREME_SCALPING': 'SCALPING',
+                        'NEWS_EXPLOSION': 'NEWS', 
+                        'BREAKOUT_MOMENTUM': 'BREAKOUT',
+                        'MARTINGALE_EXTREME': 'MARTINGALE'
+                    }
+                    strategy_config = strategy_config.copy()
+                    strategy_config['type'] = type_mapping.get(strategy_config['type'], strategy_config['type'])
+                
                 strategy = factory.create_strategy(
                     strategy_config['type'],
-                    strategy_config['name'],
                     strategy_config
                 )
                 if strategy:

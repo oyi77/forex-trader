@@ -1,0 +1,2 @@
+trade_id,symbol,signal,strategy,entry_time,exit_time,entry_price,exit_price,position_size,profit_loss,commission,slippage,confidence,duration_hours
+XAUUSD_20250501_000000,XAUUSD,BUY,Recovery_1,2025-05-01 00:00:00+00:00,2025-05-01 01:00:00+00:00,3255.126147314453,3245.675907373047,6949.945461156236,-32840453.957334362,2259.0109866925263,0.9762449707031249,84.72062231573356,1.0
