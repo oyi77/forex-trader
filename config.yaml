@@ -1,4 +1,4 @@
-# Configuration for the AI-driven trading engine
+# Forex Trading Bot Configuration
 
 # API Keys (replace with your actual keys)
 BINANCE_API_KEY: "your_binance_api_key"
@@ -11,42 +11,83 @@ EXNESS_LOGIN: "your_exness_login"
 EXNESS_PASSWORD: "your_exness_password"
 EXNESS_SERVER: "Exness-MT5"  # or "Exness-MT5-Demo" for demo account
 
-# Financial Modeling Prep API Key (for real economic calendar/news)
-# Get a free API key at https://financialmodelingprep.com/developer/docs/economic-calendar-api
+# Financial Modeling Prep API Key
 FMP_API_KEY: "8Z3mPEMSUcT9GiZmmgGcnDBIZloylElz"
 
-# Trading Parameters
-DEFAULT_TIMEFRAMES: ["1h", "30m"]
-RISK_PER_TRADE: 0.01  # 1% of equity per trade
-MAX_DRAWDOWN_PERCENT: 0.05  # 5% max drawdown before pausing trading
-MAX_POSITIONS: 3  # Maximum number of concurrent positions
-MIN_CONFIDENCE: 70  # Minimum confidence score for trade execution
+# Trading Configuration
+initial_balance: 1000000.0
+leverage: 2000
+risk_per_trade: 0.6
+max_positions: 20
+max_drawdown_threshold: 0.8
+commission_rate: 0.00005
+slippage_rate: 0.0003
+take_profit_ratio: 2.0
+
+# Data and Execution
+data_provider: YAHOO
+execution_engine: EXTREME
+log_level: INFO
+
+# Features
+extreme_mode: true
+martingale_enabled: true
+scalping_enabled: true
+news_trading_enabled: true
+enable_dashboard: true
+enable_notifications: true
+
+# Position Sizing
+position_sizing_method: FIXED_PERCENTAGE
+stop_loss_method: ATR
 
 # Forex Trading Parameters
 FOREX_SYMBOLS: ["EURUSD", "GBPUSD", "USDJPY", "USDCHF", "AUDUSD", "USDCAD", "NZDUSD"]
-FOREX_LOT_SIZE: 0.01  # Minimum lot size (0.01 = 1000 units)
-FOREX_LEVERAGE: 100  # Leverage ratio
-FOREX_SPREAD_LIMIT: 50  # Maximum spread in pips
+FOREX_LOT_SIZE: 0.01
+FOREX_SPREAD_LIMIT: 50
+
+# Trading Strategies
+strategies:
+  - name: Scalper_1
+    type: EXTREME_SCALPING
+    timeframe: 1m
+    confidence_threshold: 0.95
+    max_holding_minutes: 1
+  - name: News_Trader_1
+    type: NEWS_EXPLOSION
+    news_impact_threshold: HIGH
+    reaction_time_seconds: 3
+  - name: Momentum_1
+    type: BREAKOUT_MOMENTUM
+    momentum_threshold: 0.03
+    volume_confirmation: true
+  - name: Recovery_1
+    type: MARTINGALE_EXTREME
+    max_levels: 8
+    recovery_target: 0.1
+
+strategy_weights:
+  Scalper_1: 0.4
+  News_Trader_1: 0.3
+  Momentum_1: 0.2
+  Recovery_1: 0.1
 
 # Risk Management
-MAX_CONSECUTIVE_LOSSES: 5  # Maximum consecutive losses before pausing
-MIN_WIN_RATE: 0.3  # Minimum win rate (30%) after 10 trades
+MAX_CONSECUTIVE_LOSSES: 5
+MIN_WIN_RATE: 0.3
+MIN_CONFIDENCE: 70
 
 # Telegram Alerts (optional)
 TELEGRAM_BOT_TOKEN: "your_telegram_bot_token"
 TELEGRAM_CHAT_ID: "your_telegram_chat_id"
 
-# News Calendar API (optional, now using FMP by default)
-NEWS_API_URL: "https://financialmodelingprep.com/api/v3/economic_calendar"
-
-# Trading Schedule (optional)
-TRADING_HOURS: {
-  "start": "00:00",
-  "end": "23:59"
-}
+# Trading Schedule
+TRADING_HOURS:
+  start: "00:00"
+  end: "23:59"
 
 # Exchange Settings
-EXCHANGE: "exness"  # Options: "binance", "exness", "oanda"
-DEMO_MODE: true  # Set to false for live trading
+EXCHANGE: "exness"
+DEMO_MODE: true
 
 
