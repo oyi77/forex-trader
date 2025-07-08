@@ -14,6 +14,12 @@ from execution.execution_engine import ExecutionEngine
 from execution.exness_execution import ExnessExecutionEngine
 from monitoring.monitoring import Monitoring
 
+# Import new modules
+from backtest.backtester import Backtester
+from backtest.reporting import BacktestReporter
+from frontest.frontester import Frontester
+from frontest.reporting import FrontestReporter
+
 def load_config():
     """Load configuration from YAML file"""
     try:
@@ -44,8 +50,8 @@ def create_execution_engine(config):
         print(f"Unsupported exchange: {exchange}. Defaulting to Binance.")
         return ExecutionEngine(exchange_id='binance', config=config, demo_mode=demo_mode)
 
-def main():
-    """Main trading engine function"""
+def run_live_trading():
+    """Main trading engine function (original live trading)"""
     print("=== AI-Driven Trading Engine ===")
     print(f"Started at: {datetime.now()}")
     
@@ -190,7 +196,55 @@ def main():
                 execution_engine.shutdown()
         print("Trading engine shutdown complete.")
 
+def run_backtest():
+    print("\n=== Backtest Mode ===")
+    config = load_config()
+    # Example: Use the same strategy and data loader as live trading
+    strategy = StrategyCore(config)
+    data_loader = DataIngestion(config)
+    # You may want to implement a more advanced execution simulator for backtest
+    execution_simulator = None  # Placeholder
+    reporter = BacktestReporter()
+    backtester = Backtester(strategy, data_loader, execution_simulator, reporter)
+    results = backtester.run(config)
+    # Save report (stub)
+    reporter.generate_html_report(results, 'backtest_report.html')
+    print("Backtest completed. Report saved as backtest_report.html")
+
+def run_frontest():
+    print("\n=== Frontest (Paper Trading) Mode ===")
+    config = load_config()
+    strategy = StrategyCore(config)
+    data_source = DataIngestion(config)  # Or a live data source
+    execution_simulator = None  # Placeholder
+    reporter = FrontestReporter()
+    frontester = Frontester(strategy, data_source, execution_simulator, reporter)
+    results = frontester.run(config)
+    # Save report (stub)
+    reporter.generate_html_report(results, 'frontest_report.html')
+    print("Frontest completed. Report saved as frontest_report.html")
+
+def main_menu():
+    while True:
+        print("\n=== Trading Engine Menu ===")
+        print("1. Run Live Trading")
+        print("2. Run Backtest")
+        print("3. Run Frontest (Paper Trading)")
+        print("4. Exit")
+        choice = input("Select an option (1-4): ").strip()
+        if choice == '1':
+            run_live_trading()
+        elif choice == '2':
+            run_backtest()
+        elif choice == '3':
+            run_frontest()
+        elif choice == '4':
+            print("Exiting...")
+            break
+        else:
+            print("Invalid choice. Please select 1, 2, 3, or 4.")
+
 if __name__ == "__main__":
-    main()
+    main_menu()
 
 

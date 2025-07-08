@@ -363,6 +363,48 @@ For support and questions:
 - **Mobile App** - Trading on the go
 - **Social Trading** - Copy trading features
 
+## Backtest & Frontest Features
+
+### Structure
+- `backtest/` — Backtesting engine and reporting
+- `frontest/` — Paper trading (forward test) engine and reporting
+
+### Principles
+- SOLID, extensible, and contributor-friendly
+- Abstract interfaces for engines and reporting
+- Easy to add new strategies, data sources, or report types
+
+### Usage
+- Implement your strategy (see `core/strategy_core.py`)
+- Use `Backtester` or `Frontester` with your strategy, data loader, and execution simulator
+- Generate reports in HTML or Excel
+
+### Example (Backtest)
+```python
+from backtest.backtester import Backtester
+from backtest.reporting import BacktestReporter
+# ... import your strategy, data loader, execution simulator ...
+
+backtester = Backtester(strategy, data_loader, execution_simulator, BacktestReporter())
+results = backtester.run()
+backtester.reporter.generate_html_report(results, 'backtest_report.html')
+```
+
+### Example (Frontest)
+```python
+from frontest.frontester import Frontester
+from frontest.reporting import FrontestReporter
+# ... import your strategy, data source, execution simulator ...
+
+frontester = Frontester(strategy, data_source, execution_simulator, FrontestReporter())
+results = frontester.run()
+frontester.reporter.generate_excel_report(results, 'frontest_report.xlsx')
+```
+
+### Contributing
+- Add new strategies, data loaders, or report types by implementing the provided interfaces.
+- See `backtest/engine_interface.py` and `backtest/reporting_interface.py` for guidelines.
+
 ---
 
 **Disclaimer**: This software is for educational and research purposes. Trading involves substantial risk of loss. Always test thoroughly in demo mode before live trading. The authors are not responsible for any financial losses incurred through the use of this software.
