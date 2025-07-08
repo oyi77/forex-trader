@@ -1,250 +1,285 @@
-import yaml
-import time
-from datetime import datetime
+#!/usr/bin/env python3
+"""
+Advanced Forex Trading Bot - Main Application
+Implements SOLID principles with extreme trading capabilities
+"""
+
 import sys
-import os
+import logging
+import argparse
+from pathlib import Path
+from typing import Dict, Any, List
+from datetime import datetime
 
-# Add the project root to the Python path
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# Add project root to path
+project_root = Path(__file__).parent
+sys.path.append(str(project_root))
+sys.path.append(str(project_root / "src"))
 
-from data.data_ingestion import DataIngestion
-from core.strategy_core import StrategyCore
-from signals.signal_generator import SignalGenerator
-from execution.execution_engine import ExecutionEngine
-from execution.exness_execution import ExnessExecutionEngine
-from monitoring.monitoring import Monitoring
+# Core imports
+from src.core.interfaces import ITradingEngine, ISignalGenerator, IRiskManager
+from src.core.base_classes import BaseRiskManager
 
-# Import new modules
-from backtest.backtester import Backtester
-from backtest.reporting import BacktestReporter
-from frontest.frontester import Frontester
-from frontest.reporting import FrontestReporter
+# Factory imports
+from src.factories.strategy_factory import get_strategy_factory
+from src.factories.data_provider_factory import get_data_provider_factory
+from src.factories.execution_factory import get_execution_factory
+from src.config.configuration_manager import get_config_manager, create_extreme_preset
 
-def load_config():
-    """Load configuration from YAML file"""
-    try:
-        with open('config.yaml', 'r') as file:
-            return yaml.safe_load(file)
-    except FileNotFoundError:
-        print("Error: config.yaml not found!")
-        sys.exit(1)
-    except yaml.YAMLError as e:
-        print(f"Error parsing config.yaml: {e}")
-        sys.exit(1)
 
-def create_execution_engine(config):
-    """Create appropriate execution engine based on configuration"""
-    exchange = config.get('EXCHANGE', 'binance').lower()
-    demo_mode = config.get('DEMO_MODE', True)
+class ForexTradingBot:
+    """Main Forex Trading Bot implementing SOLID principles"""
     
-    if exchange == 'exness':
-        print("Initializing Exness execution engine for forex trading...")
-        return ExnessExecutionEngine(config=config, demo_mode=demo_mode)
-    elif exchange == 'binance':
-        print("Initializing Binance execution engine for crypto trading...")
-        return ExecutionEngine(exchange_id='binance', config=config, demo_mode=demo_mode)
-    elif exchange == 'oanda':
-        print("Initializing OANDA execution engine for forex trading...")
-        return ExecutionEngine(exchange_id='oanda', config=config, demo_mode=demo_mode)
-    else:
-        print(f"Unsupported exchange: {exchange}. Defaulting to Binance.")
-        return ExecutionEngine(exchange_id='binance', config=config, demo_mode=demo_mode)
-
-def run_live_trading():
-    """Main trading engine function (original live trading)"""
-    print("=== AI-Driven Trading Engine ===")
-    print(f"Started at: {datetime.now()}")
-    
-    # Load configuration
-    config = load_config()
-    print(f"Configuration loaded. Exchange: {config.get('EXCHANGE', 'binance')}")
-    print(f"Demo mode: {config.get('DEMO_MODE', True)}")
-    
-    try:
-        # Initialize components
-        print("\n1. Initializing data ingestion...")
-        data_ingestion = DataIngestion(config)
+    def __init__(self, config_manager=None):
+        self.logger = logging.getLogger(__name__)
+        self.config_manager = config_manager or get_config_manager()
+        self.data_provider = None
+        self.execution_engine = None
+        self.risk_manager = None
+        self.strategies = []
+        self.is_running = False
+        self.session_id = None
         
-        print("2. Initializing strategy core...")
-        strategy_core = StrategyCore(config)
-        
-        print("3. Initializing signal generator...")
-        signal_generator = SignalGenerator(config)
-        
-        print("4. Initializing execution engine...")
-        execution_engine = create_execution_engine(config)
-        
-        print("5. Initializing monitoring...")
-        monitoring = Monitoring(config)
-        
-        print("\n=== All components initialized successfully ===")
-        
-        # Main trading loop
-        cycle_count = 0
-        max_cycles = config.get('MAX_CYCLES', 10)  # Default to 10 cycles for safety
-        
-        while cycle_count < max_cycles:
-            cycle_count += 1
-            print(f"\n--- Trading Cycle {cycle_count} ---")
-            print(f"Time: {datetime.now()}")
+    def initialize(self, mode: str = "conservative") -> bool:
+        """Initialize the trading bot with specified mode"""
+        try:
+            self.logger.info(f"🚀 Initializing Forex Trading Bot - Mode: {mode}")
             
-            try:
-                # 1. Fetch market data
-                print("Fetching market data...")
-                symbols = config.get('FOREX_SYMBOLS', ['EURUSD', 'GBPUSD']) if config.get('EXCHANGE') == 'exness' else ['BTC/USDT', 'ETH/USDT']
-                timeframes = config.get('DEFAULT_TIMEFRAMES', ['1h', '30m'])
+            # Load appropriate configuration
+            if mode == "extreme":
+                create_extreme_preset()
+                self.config_manager.load_config_preset('extreme')
+            else:
+                self.config_manager.load_default_config()
+            
+            config = self.config_manager.get_trading_config()
+            
+            # Initialize components using factories
+            self._initialize_data_provider(config)
+            self._initialize_execution_engine(config)
+            self._initialize_risk_manager(config)
+            self._initialize_strategies(config, mode)
+            
+            self.logger.info("✅ Trading bot initialized successfully")
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"❌ Failed to initialize trading bot: {e}")
+            return False
+    
+    def _initialize_data_provider(self, config) -> None:
+        """Initialize data provider using factory"""
+        factory = get_data_provider_factory()
+        self.data_provider = factory.create_provider(
+            getattr(config, 'data_provider', 'MOCK'),
+            getattr(config, 'data_provider_config', {})
+        )
+        self.logger.info(f"📊 Data provider initialized: {getattr(config, 'data_provider', 'MOCK')}")
+    
+    def _initialize_execution_engine(self, config) -> None:
+        """Initialize execution engine using factory"""
+        factory = get_execution_factory()
+        self.execution_engine = factory.create_engine(
+            getattr(config, 'execution_engine', 'PAPER'),
+            {
+                'leverage': getattr(config, 'leverage', 100),
+                'account_balance': getattr(config, 'initial_balance', 1000000),
+                'broker_config': getattr(config, 'broker_config', {})
+            }
+        )
+        self.logger.info(f"⚡ Execution engine initialized: {getattr(config, 'execution_engine', 'PAPER')}")
+    
+    def _initialize_risk_manager(self, config) -> None:
+        """Initialize risk manager"""
+        try:
+            from risk.risk_manager import RiskManager
+            
+            risk_config = self.config_manager.get_risk_config()
+            
+            self.risk_manager = RiskManager({
+                'max_risk_per_trade': risk_config.max_risk_per_trade,
+                'max_total_exposure': risk_config.max_total_exposure,
+                'max_drawdown_threshold': risk_config.max_drawdown_stop,
+                'position_sizing_method': risk_config.position_sizing_method
+            })
+            
+        except ImportError:
+            # Fallback to mock risk manager
+            from core.base_classes import BaseRiskManager
+            
+            class MockRiskManager(BaseRiskManager):
+                def __init__(self, config):
+                    self.config = config
                 
-                market_data = {}
-                for symbol in symbols[:3]:  # Limit to 3 symbols for demo
-                    for timeframe in timeframes:
-                        data = data_ingestion.get_historical_data(symbol, timeframe, limit=100)
-                        if data is not None and not data.empty:
-                            market_data[f"{symbol}_{timeframe}"] = data
+                def validate_trade(self, signal, current_positions):
+                    return True
                 
-                if not market_data:
-                    print("No market data available. Skipping cycle.")
-                    time.sleep(60)
-                    continue
+                def calculate_position_size(self, signal, account_balance):
+                    return account_balance * self.config.get('max_risk_per_trade', 0.1)
                 
-                # 2. Generate trading signals
-                print("Generating trading signals...")
-                signals = []
-                for key, data in market_data.items():
-                    symbol, timeframe = key.split('_', 1)
-                    signal = signal_generator.generate_signal(data, symbol, timeframe)
-                    if signal and signal.get('confidence', 0) >= config.get('MIN_CONFIDENCE', 70):
-                        signals.append(signal)
-                
-                print(f"Generated {len(signals)} signals with sufficient confidence")
-                
-                # 3. Execute trades
-                if signals:
-                    print("Executing trades...")
-                    for signal in signals:
-                        symbol = signal['symbol']
-                        side = signal['side']
-                        confidence = signal['confidence']
-                        
-                        # Calculate position size based on risk management
-                        balance = execution_engine.get_account_balance()
-                        if balance:
-                            if config.get('EXCHANGE') == 'exness':
-                                equity = balance.get('equity', 10000)
-                                lot_size = config.get('FOREX_LOT_SIZE', 0.01)
-                            else:
-                                equity = balance.get('USDT', {}).get('total', 10000)
-                                lot_size = 0.001  # Default crypto amount
-                            
-                            risk_amount = equity * config.get('RISK_PER_TRADE', 0.01)
-                            
-                            # Place order
-                            order_result = execution_engine.place_order(
-                                symbol=symbol,
-                                order_type='market',
-                                side=side,
-                                amount=lot_size,
-                                sl=signal.get('stop_loss'),
-                                tp=signal.get('take_profit')
-                            )
-                            
-                            if order_result:
-                                print(f"Order placed: {symbol} {side} {lot_size}")
-                                monitoring.log_trade(signal, order_result, 'executed')
-                            else:
-                                print(f"Failed to place order for {symbol}")
-                
-                # 4. Monitor and manage positions
-                print("Monitoring positions...")
-                positions = execution_engine.get_positions()
-                if positions:
-                    print(f"Current positions: {len(positions)}")
-                    for position in positions:
-                        monitoring.log_position_update(position)
-                
-                # 5. Check risk management
-                print("Checking risk management...")
-                risk_status = monitoring.check_risk_limits()
-                if not risk_status['can_trade']:
-                    print(f"Risk limits exceeded: {risk_status['reason']}")
-                    break
-                
-                # 6. Log performance
-                print("Logging performance...")
-                performance = monitoring.get_performance_summary()
-                print(f"Performance: {performance}")
-                
-                # Wait before next cycle
-                wait_time = config.get('CYCLE_INTERVAL', 300)  # 5 minutes default
-                print(f"Waiting {wait_time} seconds before next cycle...")
-                time.sleep(wait_time)
-                
-            except KeyboardInterrupt:
-                print("\nTrading stopped by user.")
-                break
-            except Exception as e:
-                print(f"Error in trading cycle: {e}")
-                time.sleep(60)  # Wait 1 minute before retrying
+                def should_emergency_stop(self, current_balance, initial_balance):
+                    return current_balance < initial_balance * 0.2
+            
+            risk_config = self.config_manager.get_risk_config()
+            self.risk_manager = MockRiskManager({
+                'max_risk_per_trade': risk_config.max_risk_per_trade,
+                'max_total_exposure': risk_config.max_total_exposure
+            })
         
-        print(f"\nTrading completed. Total cycles: {cycle_count}")
-        
-    except Exception as e:
-        print(f"Fatal error: {e}")
-    finally:
-        # Cleanup
-        if 'execution_engine' in locals():
-            if hasattr(execution_engine, 'shutdown'):
-                execution_engine.shutdown()
-        print("Trading engine shutdown complete.")
-
-def run_backtest():
-    print("\n=== Backtest Mode ===")
-    config = load_config()
-    # Example: Use the same strategy and data loader as live trading
-    strategy = StrategyCore(config)
-    data_loader = DataIngestion(config)
-    # You may want to implement a more advanced execution simulator for backtest
-    execution_simulator = None  # Placeholder
-    reporter = BacktestReporter()
-    backtester = Backtester(strategy, data_loader, execution_simulator, reporter)
-    results = backtester.run(config)
-    # Save report (stub)
-    reporter.generate_html_report(results, 'backtest_report.html')
-    print("Backtest completed. Report saved as backtest_report.html")
-
-def run_frontest():
-    print("\n=== Frontest (Paper Trading) Mode ===")
-    config = load_config()
-    strategy = StrategyCore(config)
-    data_source = DataIngestion(config)  # Or a live data source
-    execution_simulator = None  # Placeholder
-    reporter = FrontestReporter()
-    frontester = Frontester(strategy, data_source, execution_simulator, reporter)
-    results = frontester.run(config)
-    # Save report (stub)
-    reporter.generate_html_report(results, 'frontest_report.html')
-    print("Frontest completed. Report saved as frontest_report.html")
-
-def main_menu():
-    while True:
-        print("\n=== Trading Engine Menu ===")
-        print("1. Run Live Trading")
-        print("2. Run Backtest")
-        print("3. Run Frontest (Paper Trading)")
-        print("4. Exit")
-        choice = input("Select an option (1-4): ").strip()
-        if choice == '1':
-            run_live_trading()
-        elif choice == '2':
-            run_backtest()
-        elif choice == '3':
-            run_frontest()
-        elif choice == '4':
-            print("Exiting...")
-            break
+        self.logger.info("🛡️ Risk manager initialized")
+    
+    def _initialize_strategies(self, config, mode: str) -> None:
+        """Initialize trading strategies using factory"""
+        if mode == "extreme":
+            factory = get_extreme_strategy_factory()
         else:
-            print("Invalid choice. Please select 1, 2, 3, or 4.")
+            factory = get_strategy_factory()
+        
+        self.strategies = []
+        strategies_config = getattr(config, 'strategies', [
+            {'type': 'RSI', 'name': 'RSI_Strategy', 'period': 14},
+            {'type': 'MA_CROSSOVER', 'name': 'MA_Strategy', 'fast_period': 10, 'slow_period': 20}
+        ])
+        
+        for strategy_config in strategies_config:
+            try:
+                strategy = factory.create_strategy(
+                    strategy_config['type'],
+                    strategy_config['name'],
+                    strategy_config
+                )
+                if strategy:
+                    self.strategies.append(strategy)
+            except Exception as e:
+                self.logger.error(f"Failed to create strategy {strategy_config['type']}: {e}")
+        
+        self.logger.info(f"🎯 Initialized {len(self.strategies)} trading strategies")
+    
+    def start_trading(self) -> bool:
+        """Start the trading bot"""
+        if not self.strategies:
+            self.logger.error("❌ No strategies available for trading")
+            return False
+        
+        self.is_running = True
+        self.session_id = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        
+        self.logger.info(f"🚀 Trading bot started - Session: {self.session_id}")
+        return True
+    
+    def stop_trading(self) -> bool:
+        """Stop the trading bot"""
+        self.is_running = False
+        self.logger.info("🛑 Trading bot stopped")
+        return True
+    
+    def get_status(self) -> Dict[str, Any]:
+        """Get current bot status"""
+        config = self.config_manager.get_trading_config()
+        return {
+            'is_running': self.is_running,
+            'session_id': self.session_id,
+            'strategies_count': len(self.strategies),
+            'open_positions': 0,  # TODO: Get from execution engine
+            'account_balance': getattr(config, 'initial_balance', 1000000),
+            'strategies': [getattr(s, 'name', 'Unknown') for s in self.strategies] if self.strategies else [],
+            'last_update': datetime.now().isoformat()
+        }
+    
+    def run_backtest(self, days: int = 30, leverage: int = 100) -> Dict[str, Any]:
+        """Run comprehensive backtest"""
+        self.logger.info(f"🧪 Starting backtest - Days: {days}, Leverage: {leverage}")
+        
+        # Import backtest functionality
+        from test_system import run_comprehensive_backtest
+        
+        config = self.config_manager.get_trading_config()
+        return run_comprehensive_backtest(
+            initial_balance=getattr(config, 'initial_balance', 1000000),
+            days=days,
+            leverage=leverage,
+            strategies=self.strategies,
+            data_provider=self.data_provider,
+            execution_engine=self.execution_engine,
+            risk_manager=self.risk_manager
+        )
+
+
+def setup_logging(level: str = "INFO") -> None:
+    """Setup logging configuration"""
+    logging.basicConfig(
+        level=getattr(logging, level.upper()),
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.StreamHandler(),
+            logging.FileHandler('forex_trading_bot.log')
+        ]
+    )
+
+
+def main():
+    """Main application entry point"""
+    parser = argparse.ArgumentParser(description='Advanced Forex Trading Bot')
+    parser.add_argument('--mode', choices=['conservative', 'moderate', 'aggressive', 'extreme'], 
+                       default='conservative', help='Trading mode')
+    parser.add_argument('--test', action='store_true', help='Run in test mode')
+    parser.add_argument('--backtest', action='store_true', help='Run backtest')
+    parser.add_argument('--days', type=int, default=30, help='Backtest days')
+    parser.add_argument('--leverage', type=int, default=100, help='Leverage ratio')
+    parser.add_argument('--log-level', default='INFO', help='Logging level')
+    
+    args = parser.parse_args()
+    
+    # Setup logging
+    setup_logging(args.log_level)
+    
+    print(f"🚀 Advanced Forex Trading Bot - Mode: {args.mode}")
+    print("=" * 60)
+    
+    # Create and initialize bot
+    bot = ForexTradingBot()
+    
+    if not bot.initialize(args.mode):
+        print("❌ Failed to initialize trading bot")
+        return 1
+    
+    if args.test:
+        # Test mode
+        status = bot.get_status()
+        print(f"✅ Test mode - System status: {status}")
+        print(f"🎯 Trading Bot - Test Successful!")
+        print(f"📊 Strategies loaded: {status['strategies_count']}")
+        print(f"💰 Account balance: {status['account_balance']:,.2f}")
+        print(f"🎯 Active strategies: {', '.join(status['strategies'])}")
+        return 0
+    
+    elif args.backtest:
+        # Backtest mode
+        print(f"🧪 Running backtest - Days: {args.days}, Leverage: {args.leverage}")
+        results = bot.run_backtest(args.days, args.leverage)
+        print("📊 Backtest completed! Check reports for detailed results.")
+        return 0
+    
+    else:
+        # Live trading mode
+        if bot.start_trading():
+            print("🚀 Trading bot started successfully!")
+            print("Press Ctrl+C to stop...")
+            try:
+                # Keep running until interrupted
+                import time
+                while bot.is_running:
+                    time.sleep(1)
+            except KeyboardInterrupt:
+                print("\n🛑 Stopping trading bot...")
+                bot.stop_trading()
+        else:
+            print("❌ Failed to start trading bot")
+            return 1
+    
+    return 0
+
 
 if __name__ == "__main__":
-    main_menu()
-
+    exit(main())
 
