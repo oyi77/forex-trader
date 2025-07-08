@@ -1,0 +1,77 @@
+# Enhanced Forex Trading Bot Requirements
+
+# Core dependencies
+pandas>=1.5.0
+numpy>=1.21.0
+scikit-learn>=1.1.0
+scipy>=1.9.0
+
+# Technical analysis
+ta>=0.10.0
+
+# Machine learning and data science
+joblib>=1.2.0
+
+# Async HTTP requests
+aiohttp>=3.8.0
+
+# Configuration and data formats
+PyYAML>=6.0
+python-dotenv>=0.19.0
+
+# Logging and monitoring
+colorlog>=6.6.0
+
+# API and web frameworks
+requests>=2.28.0
+flask>=2.2.0
+flask-cors>=3.0.10
+
+# Data visualization (optional)
+matplotlib>=3.5.0
+plotly>=5.10.0
+
+# Database (optional)
+sqlite3
+
+# Timezone handling
+pytz>=2022.1
+
+# Mathematical operations
+sympy>=1.10.0
+
+# WebSocket support
+websockets>=10.3
+
+# Cryptography for secure API connections
+cryptography>=37.0.0
+
+# JSON Web Tokens
+PyJWT>=2.4.0
+
+# HTTP client with better features
+httpx>=0.23.0
+
+# Progress bars and CLI tools
+tqdm>=4.64.0
+click>=8.1.0
+
+# Environment variables
+python-decouple>=3.6
+
+# Caching
+redis>=4.3.0
+
+# Task scheduling
+APScheduler>=3.9.0
+
+# Testing (development)
+pytest>=7.1.0
+pytest-asyncio>=0.19.0
+
+# Code quality (development)
+black>=22.6.0
+flake8>=5.0.0
+mypy>=0.971
+
+yfinance

@@ -113,3 +113,6 @@ Thumbs.db
 
 # Project-specific
 config.yaml
+node_modules/
+venv/
+__pycache__/

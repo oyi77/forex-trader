@@ -1,0 +1,17 @@
+{
+  "test_timestamp": "2025-07-08T12:25:01.100553",
+  "total_tests": 8,
+  "passed_tests": 8,
+  "failed_tests": 0,
+  "success_rate": 100.0,
+  "test_results": {
+    "imports": true,
+    "config_loading": true,
+    "signal_generation": true,
+    "risk_management": true,
+    "backtesting": true,
+    "data_providers": true,
+    "portfolio_optimization": true,
+    "main_bot": true
+  }
+}

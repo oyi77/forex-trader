@@ -1,1 +1,2 @@
-# Monitoring module for trading engine 
+# Monitoring Module for Forex Trading Bot
+

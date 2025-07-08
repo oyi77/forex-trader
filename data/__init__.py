@@ -1,1 +1,2 @@
-# Data module for trading engine 
+# Data Module for Forex Trading Bot
+
