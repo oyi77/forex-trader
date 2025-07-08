@@ -1,139 +1,196 @@
 import yaml
 import time
 from datetime import datetime
+import sys
+import os
+
+# Add the project root to the Python path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from data.data_ingestion import DataIngestion
 from core.strategy_core import StrategyCore
 from signals.signal_generator import SignalGenerator
 from execution.execution_engine import ExecutionEngine
+from execution.exness_execution import ExnessExecutionEngine
 from monitoring.monitoring import Monitoring
 
-class TradingEngine:
-    def __init__(self, config_path='config.yaml', demo_mode=True):
-        self.config = self._load_config(config_path)
-        self.demo_mode = demo_mode
-
-        self.data_ingestion = DataIngestion(exchange_id='binance', config=self.config, demo_mode=self.demo_mode)
-        self.strategy_core = StrategyCore()
-        self.signal_generator = SignalGenerator()
-        self.execution_engine = ExecutionEngine(exchange_id='binance', config=self.config, demo_mode=self.demo_mode)
-        self.monitoring = Monitoring(config=self.config)
-
-        self.supported_symbols = ['BTC/USDT', 'ETH/USDT', 'XRP/USDT', 'LTC/USDT', 'BCH/USDT', 'ADA/USDT', 'DOT/USDT', 'LINK/USDT', 'SOL/USDT', 'BNB/USDT'] # Example symbols
-        self.timeframes = self.config.get('DEFAULT_TIMEFRAMES', ['1h', '30m'])
-
-    def _load_config(self, config_path):
-        with open(config_path, 'r') as file:
+def load_config():
+    """Load configuration from YAML file"""
+    try:
+        with open('config.yaml', 'r') as file:
             return yaml.safe_load(file)
+    except FileNotFoundError:
+        print("Error: config.yaml not found!")
+        sys.exit(1)
+    except yaml.YAMLError as e:
+        print(f"Error parsing config.yaml: {e}")
+        sys.exit(1)
 
-    def scan_all_pairs(self):
-        print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Scanning all pairs for setups...")
-        top_setups = []
-        for symbol in self.supported_symbols:
-            market_data = self.data_ingestion.scan_market_data([symbol], self.timeframes)
-            for tf in self.timeframes:
-                df = market_data[symbol][tf]
-                if not df.empty:
-                    processed_df = self.strategy_core.apply_all_strategies(df.copy())
-                    signal = self.signal_generator.generate_signal(processed_df, symbol, tf)
-                    if signal and signal['signal_type'] != 'NONE':
-                        top_setups.append(signal)
+def create_execution_engine(config):
+    """Create appropriate execution engine based on configuration"""
+    exchange = config.get('EXCHANGE', 'binance').lower()
+    demo_mode = config.get('DEMO_MODE', True)
+    
+    if exchange == 'exness':
+        print("Initializing Exness execution engine for forex trading...")
+        return ExnessExecutionEngine(config=config, demo_mode=demo_mode)
+    elif exchange == 'binance':
+        print("Initializing Binance execution engine for crypto trading...")
+        return ExecutionEngine(exchange_id='binance', config=config, demo_mode=demo_mode)
+    elif exchange == 'oanda':
+        print("Initializing OANDA execution engine for forex trading...")
+        return ExecutionEngine(exchange_id='oanda', config=config, demo_mode=demo_mode)
+    else:
+        print(f"Unsupported exchange: {exchange}. Defaulting to Binance.")
+        return ExecutionEngine(exchange_id='binance', config=config, demo_mode=demo_mode)
+
+def main():
+    """Main trading engine function"""
+    print("=== AI-Driven Trading Engine ===")
+    print(f"Started at: {datetime.now()}")
+    
+    # Load configuration
+    config = load_config()
+    print(f"Configuration loaded. Exchange: {config.get('EXCHANGE', 'binance')}")
+    print(f"Demo mode: {config.get('DEMO_MODE', True)}")
+    
+    try:
+        # Initialize components
+        print("\n1. Initializing data ingestion...")
+        data_ingestion = DataIngestion(config)
         
-        # Sort by confidence score and return top 3
-        top_setups.sort(key=lambda x: x['confidence_score'], reverse=True)
+        print("2. Initializing strategy core...")
+        strategy_core = StrategyCore(config)
         
-        print("\n--- Top 3 Setups ---")
-        if not top_setups:
-            print("No setups found.")
-        for i, setup in enumerate(top_setups[:3]):
-            print(f"Setup {i+1}: {setup['emoji']} {setup['signal_type']} {setup['symbol']} ({setup['timeframe']}) - Confidence: {setup['confidence_score']}%\n  Entry: {setup['entry_price']}, SL: {setup['stop_loss']}, TP1: {setup['take_profit'][0]}\n  RR: {setup['risk_reward_ratio']}, Expiry: {setup['expiry_time_hours']}h\n  Alert: {setup['alert_message']} {setup['status_tag']}")
-        print("--------------------")
-        return top_setups[:3]
-
-    def execute_trade_from_signal(self, signal):
-        if self.monitoring.trading_paused:
-            print(f"Trading is paused. Cannot execute {signal['signal_type']} for {signal['symbol']}.")
-            return
-
-        symbol = signal['symbol']
-        side = signal['signal_type'].lower()
-        entry_price = signal['entry_price']
-        stop_loss = signal['stop_loss']
-        take_profit = signal['take_profit'][0] # Use TP1 for initial order
-
-        # Calculate amount based on risk per trade and stop loss
-        # This is a simplified calculation and needs proper position sizing logic
-        risk_per_trade_usd = self.monitoring.current_equity * self.config.get('RISK_PER_TRADE', 0.01)
-        if side == 'buy':
-            price_diff = entry_price - stop_loss
-        else:
-            price_diff = stop_loss - entry_price
+        print("3. Initializing signal generator...")
+        signal_generator = SignalGenerator(config)
         
-        if price_diff <= 0:
-            print(f"Invalid SL for {symbol}. Cannot calculate position size.")
-            return
-
-        # Assuming 1 unit of base currency (e.g., BTC) is worth entry_price USDT
-        # This needs to be adjusted for different symbols and exchanges
-        amount = risk_per_trade_usd / price_diff / entry_price # Approximate amount
-        amount = round(amount, 5) # Round to appropriate decimal places
-
-        print(f"Attempting to place {side} order for {amount} {symbol} at {entry_price} with SL {stop_loss} and TP {take_profit}")
-        order_result = self.execution_engine.place_order(symbol, 'limit', side, amount, entry_price, params={'stopLossPrice': stop_loss, 'takeProfitPrice': take_profit})
+        print("4. Initializing execution engine...")
+        execution_engine = create_execution_engine(config)
         
-        if order_result and order_result.get('status') == 'closed': # Assuming market orders close immediately in demo
-            pnl = (order_result['price'] - entry_price) * amount if side == 'buy' else (entry_price - order_result['price']) * amount
-            self.monitoring.log_trade({
-                'symbol': symbol,
-                'side': side,
-                'entry_price': entry_price,
-                'exit_price': order_result['price'],
-                'pnl': pnl,
-                'timestamp': datetime.now().isoformat()
-            })
-            self.monitoring.drawdown_monitor(pnl)
-            print(f"Trade executed for {symbol}. PnL: {pnl:.2f}")
-        elif order_result:
-            print(f"Order for {symbol} placed, status: {order_result.get('status')}")
-        else:
-            print(f"Failed to place order for {symbol}.")
-
-    def summarize_trades(self):
-        print("\n--- Trade Performance Summary ---")
-        performance = self.monitoring.performance_logger()
-        print(f"Total Trades: {len(self.monitoring.trade_log)}")
-        print(f"Win Rate: {performance['win_rate']:.2%}")
-        print(f"Total PnL: {performance['total_pnl']:.2f}")
-        print(f"Max Drawdown: {performance['max_drawdown']:.2%}")
-        print("\n--- Full Trade Log ---")
-        if not self.monitoring.trade_log:
-            print("No trades logged yet.")
-        for trade in self.monitoring.trade_log:
-            print(f"Symbol: {trade['symbol']}, Side: {trade['side']}, Entry: {trade['entry_price']}, Exit: {trade.get('exit_price', 'N/A')}, PnL: {trade['pnl']:.2f}")
-        print("------------------------")
-
-    def run(self, interval_minutes=60):
-        print("Starting trading engine...")
-        while True:
-            self.monitoring.volatility_guard()
-            if not self.monitoring.trading_paused:
-                setups = self.scan_all_pairs()
-                for signal in setups:
-                    self.execute_trade_from_signal(signal)
-            else:
-                print("Trading paused by monitoring system.")
+        print("5. Initializing monitoring...")
+        monitoring = Monitoring(config)
+        
+        print("\n=== All components initialized successfully ===")
+        
+        # Main trading loop
+        cycle_count = 0
+        max_cycles = config.get('MAX_CYCLES', 10)  # Default to 10 cycles for safety
+        
+        while cycle_count < max_cycles:
+            cycle_count += 1
+            print(f"\n--- Trading Cycle {cycle_count} ---")
+            print(f"Time: {datetime.now()}")
             
-            self.monitoring.position_tracker(self.execution_engine.get_open_orders())
-            self.summarize_trades()
-            
-            print(f"Waiting for {interval_minutes} minutes...")
-            time.sleep(interval_minutes * 60)
+            try:
+                # 1. Fetch market data
+                print("Fetching market data...")
+                symbols = config.get('FOREX_SYMBOLS', ['EURUSD', 'GBPUSD']) if config.get('EXCHANGE') == 'exness' else ['BTC/USDT', 'ETH/USDT']
+                timeframes = config.get('DEFAULT_TIMEFRAMES', ['1h', '30m'])
+                
+                market_data = {}
+                for symbol in symbols[:3]:  # Limit to 3 symbols for demo
+                    for timeframe in timeframes:
+                        data = data_ingestion.get_historical_data(symbol, timeframe, limit=100)
+                        if data is not None and not data.empty:
+                            market_data[f"{symbol}_{timeframe}"] = data
+                
+                if not market_data:
+                    print("No market data available. Skipping cycle.")
+                    time.sleep(60)
+                    continue
+                
+                # 2. Generate trading signals
+                print("Generating trading signals...")
+                signals = []
+                for key, data in market_data.items():
+                    symbol, timeframe = key.split('_', 1)
+                    signal = signal_generator.generate_signal(data, symbol, timeframe)
+                    if signal and signal.get('confidence', 0) >= config.get('MIN_CONFIDENCE', 70):
+                        signals.append(signal)
+                
+                print(f"Generated {len(signals)} signals with sufficient confidence")
+                
+                # 3. Execute trades
+                if signals:
+                    print("Executing trades...")
+                    for signal in signals:
+                        symbol = signal['symbol']
+                        side = signal['side']
+                        confidence = signal['confidence']
+                        
+                        # Calculate position size based on risk management
+                        balance = execution_engine.get_account_balance()
+                        if balance:
+                            if config.get('EXCHANGE') == 'exness':
+                                equity = balance.get('equity', 10000)
+                                lot_size = config.get('FOREX_LOT_SIZE', 0.01)
+                            else:
+                                equity = balance.get('USDT', {}).get('total', 10000)
+                                lot_size = 0.001  # Default crypto amount
+                            
+                            risk_amount = equity * config.get('RISK_PER_TRADE', 0.01)
+                            
+                            # Place order
+                            order_result = execution_engine.place_order(
+                                symbol=symbol,
+                                order_type='market',
+                                side=side,
+                                amount=lot_size,
+                                sl=signal.get('stop_loss'),
+                                tp=signal.get('take_profit')
+                            )
+                            
+                            if order_result:
+                                print(f"Order placed: {symbol} {side} {lot_size}")
+                                monitoring.log_trade(signal, order_result, 'executed')
+                            else:
+                                print(f"Failed to place order for {symbol}")
+                
+                # 4. Monitor and manage positions
+                print("Monitoring positions...")
+                positions = execution_engine.get_positions()
+                if positions:
+                    print(f"Current positions: {len(positions)}")
+                    for position in positions:
+                        monitoring.log_position_update(position)
+                
+                # 5. Check risk management
+                print("Checking risk management...")
+                risk_status = monitoring.check_risk_limits()
+                if not risk_status['can_trade']:
+                    print(f"Risk limits exceeded: {risk_status['reason']}")
+                    break
+                
+                # 6. Log performance
+                print("Logging performance...")
+                performance = monitoring.get_performance_summary()
+                print(f"Performance: {performance}")
+                
+                # Wait before next cycle
+                wait_time = config.get('CYCLE_INTERVAL', 300)  # 5 minutes default
+                print(f"Waiting {wait_time} seconds before next cycle...")
+                time.sleep(wait_time)
+                
+            except KeyboardInterrupt:
+                print("\nTrading stopped by user.")
+                break
+            except Exception as e:
+                print(f"Error in trading cycle: {e}")
+                time.sleep(60)  # Wait 1 minute before retrying
+        
+        print(f"\nTrading completed. Total cycles: {cycle_count}")
+        
+    except Exception as e:
+        print(f"Fatal error: {e}")
+    finally:
+        # Cleanup
+        if 'execution_engine' in locals():
+            if hasattr(execution_engine, 'shutdown'):
+                execution_engine.shutdown()
+        print("Trading engine shutdown complete.")
 
 if __name__ == "__main__":
-    # To run in demo mode (no real trades, just simulations):
-    engine = TradingEngine(demo_mode=True)
-    # To run with real trading (requires API keys in config.yaml and demo_mode=False):
-    # engine = TradingEngine(demo_mode=False)
-    engine.run(interval_minutes=1) # Scan every 1 minute for testing
+    main()
 
 

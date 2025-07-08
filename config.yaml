@@ -6,17 +6,47 @@ BINANCE_API_SECRET: "your_binance_api_secret"
 OANDA_API_KEY: "your_oanda_api_key"
 OANDA_ACCOUNT_ID: "your_oanda_account_id"
 
+# Exness MT5 Configuration (for forex trading)
+EXNESS_LOGIN: "your_exness_login"
+EXNESS_PASSWORD: "your_exness_password"
+EXNESS_SERVER: "Exness-MT5"  # or "Exness-MT5-Demo" for demo account
+
+# Financial Modeling Prep API Key (for real economic calendar/news)
+# Get a free API key at https://financialmodelingprep.com/developer/docs/economic-calendar-api
+FMP_API_KEY: "8Z3mPEMSUcT9GiZmmgGcnDBIZloylElz"
+
 # Trading Parameters
-DEFAULT_TIMEFRAMES: ["H1", "M30"]
-RISK_PER_TRADE: 0.01 # 1% of equity
-MAX_DRAWDOWN_PERCENT: 0.05 # 5% max drawdown before pausing trading
+DEFAULT_TIMEFRAMES: ["1h", "30m"]
+RISK_PER_TRADE: 0.01  # 1% of equity per trade
+MAX_DRAWDOWN_PERCENT: 0.05  # 5% max drawdown before pausing trading
+MAX_POSITIONS: 3  # Maximum number of concurrent positions
+MIN_CONFIDENCE: 70  # Minimum confidence score for trade execution
+
+# Forex Trading Parameters
+FOREX_SYMBOLS: ["EURUSD", "GBPUSD", "USDJPY", "USDCHF", "AUDUSD", "USDCAD", "NZDUSD"]
+FOREX_LOT_SIZE: 0.01  # Minimum lot size (0.01 = 1000 units)
+FOREX_LEVERAGE: 100  # Leverage ratio
+FOREX_SPREAD_LIMIT: 50  # Maximum spread in pips
+
+# Risk Management
+MAX_CONSECUTIVE_LOSSES: 5  # Maximum consecutive losses before pausing
+MIN_WIN_RATE: 0.3  # Minimum win rate (30%) after 10 trades
 
 # Telegram Alerts (optional)
 TELEGRAM_BOT_TOKEN: "your_telegram_bot_token"
 TELEGRAM_CHAT_ID: "your_telegram_chat_id"
 
-# News Calendar API (optional)
-NEWS_API_KEY: "your_news_api_key"
-NEWS_API_URL: "https://some_news_api.com/v1/calendar"
+# News Calendar API (optional, now using FMP by default)
+NEWS_API_URL: "https://financialmodelingprep.com/api/v3/economic_calendar"
+
+# Trading Schedule (optional)
+TRADING_HOURS: {
+  "start": "00:00",
+  "end": "23:59"
+}
+
+# Exchange Settings
+EXCHANGE: "exness"  # Options: "binance", "exness", "oanda"
+DEMO_MODE: true  # Set to false for live trading
 
 
