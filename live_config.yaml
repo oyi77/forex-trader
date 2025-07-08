@@ -1,0 +1,38 @@
+exness:
+  base_currency: IDR
+  leverage: 2000
+  login: 0
+  password: ''
+  server: Exness-MT5Real
+monitoring:
+  heartbeat_interval: 30
+  report_interval: 300
+  update_interval: 60
+risk_management:
+  emergency_stop_loss: 0.5
+  max_daily_loss: 0.2
+  max_drawdown: 0.3
+  max_positions: 3
+  max_risk_per_trade: 0.15
+trading:
+  initial_balance: 1000000
+  strategies:
+  - name: Extreme_Scalping_1
+    type: EXTREME_SCALPING
+    weight: 0.3
+  - name: News_Explosion_1
+    type: NEWS_EXPLOSION
+    weight: 0.2
+  - name: Breakout_Momentum_1
+    type: BREAKOUT_MOMENTUM
+    weight: 0.3
+  - name: Martingale_Recovery_1
+    type: MARTINGALE_EXTREME
+    weight: 0.2
+  symbols:
+  - EURUSD
+  - GBPUSD
+  - USDJPY
+  - XAUUSD
+  target_balance: 2000000000
+  target_days: 15
