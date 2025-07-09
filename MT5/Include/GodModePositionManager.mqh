@@ -295,7 +295,31 @@ public:
         
         // Clear tracking
         m_positionCount = 0;
-        ArrayInitialize(m_positions, 0);
+        // Reset all position data manually (ArrayInitialize doesn't work with structs)
+        for(int i = 0; i < ArraySize(m_positions); i++)
+        {
+            m_positions[i].ticket = 0;
+            m_positions[i].symbol = "";
+            m_positions[i].strategy = "";
+            m_positions[i].type = POSITION_TYPE_BUY;
+            m_positions[i].volume = 0.0;
+            m_positions[i].openPrice = 0.0;
+            m_positions[i].currentPrice = 0.0;
+            m_positions[i].stopLoss = 0.0;
+            m_positions[i].takeProfit = 0.0;
+            m_positions[i].profit = 0.0;
+            m_positions[i].openTime = 0;
+            m_positions[i].confidence = 0.0;
+            m_positions[i].trailingActive = false;
+            m_positions[i].trailingStop = 0.0;
+            m_positions[i].highestPrice = 0.0;
+            m_positions[i].lowestPrice = 0.0;
+            m_positions[i].partialClosed = false;
+            m_positions[i].originalVolume = 0.0;
+            m_positions[i].holdTime = 0;
+            m_positions[i].maxProfit = 0.0;
+            m_positions[i].maxLoss = 0.0;
+        }
     }
     
     //+------------------------------------------------------------------+
