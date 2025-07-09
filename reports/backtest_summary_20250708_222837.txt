@@ -1,0 +1,26 @@
+ENHANCED BACKTEST SUMMARY REPORT
+==================================================
+
+Initial Balance: $1,000,000.00
+Final Balance: $-26,471,810,585.53
+Total Return: $-26,472,810,585.53 (-2647281.06%)
+Annualized Return: nan%
+
+Total Trades: 2
+Winning Trades: 1
+Losing Trades: 1
+Win Rate: 50.00%
+
+Profit Factor: 0.03
+Average Win: $682554434.91
+Average Loss: $-27154416019.82
+Largest Win: $682554434.91
+Largest Loss: $-27154416019.82
+
+Maximum Drawdown: 1527.89%
+Sharpe Ratio: 1.21
+Sortino Ratio: 1.88
+Calmar Ratio: nan
+
+SYMBOL PERFORMANCE:
+XAUUSD: $-26,471,861,584.91

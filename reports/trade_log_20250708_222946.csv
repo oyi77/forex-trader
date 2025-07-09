@@ -1,0 +1,2 @@
+trade_id,symbol,signal,strategy,entry_time,exit_time,entry_price,exit_price,position_size,profit_loss,commission,slippage,confidence,duration_hours
+USDJPY_20250706_230000,USDJPY,SELL,MARTINGALE_3,2025-07-06 23:00:00+00:00,2025-07-07 01:00:00+00:00,145.0010444818909,145.098947312854,2449630.464207168,-393077970.5360965,7106.377775666566,0.0014500249450683596,83.98556896524016,2.0

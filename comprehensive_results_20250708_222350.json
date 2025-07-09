@@ -1,0 +1,808 @@
+{
+  "total_tests": 200,
+  "successful_configs": [],
+  "target_achieved": false,
+  "best_results": [],
+  "all_results": [
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    },
+    {
+      "return": -100,
+      "error": "BacktestConfig.__init__() got an unexpected keyword argument 'commission'"
+    }
+  ]
+}

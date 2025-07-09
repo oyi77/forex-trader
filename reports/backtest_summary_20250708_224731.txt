@@ -1,0 +1,29 @@
+ENHANCED BACKTEST SUMMARY REPORT
+==================================================
+
+Initial Balance: $1,000,000.00
+Final Balance: $-40,509,401.89
+Total Return: $-41,509,401.89 (-4150.94%)
+Annualized Return: nan%
+
+Total Trades: 4
+Winning Trades: 1
+Losing Trades: 3
+Win Rate: 25.00%
+
+Profit Factor: 0.17
+Average Win: $8230748.48
+Average Loss: $-16580050.12
+Largest Win: $8230748.48
+Largest Loss: $-27203253.96
+
+Maximum Drawdown: 4150.94%
+Sharpe Ratio: -2.27
+Sortino Ratio: 0.00
+Calmar Ratio: nan
+
+SYMBOL PERFORMANCE:
+EURUSD: $-9,704,494.96
+GBPUSD: $-12,832,401.44
+USDJPY: $8,230,748.48
+XAUUSD: $-27,203,253.96

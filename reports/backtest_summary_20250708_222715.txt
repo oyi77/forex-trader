@@ -1,0 +1,26 @@
+ENHANCED BACKTEST SUMMARY REPORT
+==================================================
+
+Initial Balance: $1,000,000.00
+Final Balance: $-378,209,006.55
+Total Return: $-379,209,006.55 (-37920.90%)
+Annualized Return: nan%
+
+Total Trades: 1
+Winning Trades: 0
+Losing Trades: 1
+Win Rate: 0.00%
+
+Profit Factor: 0.00
+Average Win: $0.00
+Average Loss: $-379205502.96
+Largest Win: $0.00
+Largest Loss: $-379205502.96
+
+Maximum Drawdown: 138.63%
+Sharpe Ratio: 1.37
+Sortino Ratio: 0.00
+Calmar Ratio: nan
+
+SYMBOL PERFORMANCE:
+USDJPY: $-379,205,502.96

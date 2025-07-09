@@ -1,0 +1,25 @@
+ENHANCED BACKTEST SUMMARY REPORT
+==================================================
+
+Initial Balance: $1,000,000.00
+Final Balance: $1,000,000.00
+Total Return: $0.00 (0.00%)
+Annualized Return: 0.00%
+
+Total Trades: 0
+Winning Trades: 0
+Losing Trades: 0
+Win Rate: 0.00%
+
+Profit Factor: 0.00
+Average Win: $0.00
+Average Loss: $0.00
+Largest Win: $0.00
+Largest Loss: $0.00
+
+Maximum Drawdown: 0.00%
+Sharpe Ratio: 0.00
+Sortino Ratio: 0.00
+Calmar Ratio: 0.00
+
+SYMBOL PERFORMANCE:

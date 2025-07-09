@@ -293,24 +293,45 @@ class ExtremeStrategyFactory(StrategyFactory):
                 BreakoutMomentumStrategy, MartingaleExtremeStrategy
             )
             
-            # Import new extreme leverage strategies
-            from ..strategies.extreme_leverage_strategies import (
-                UltraScalpingStrategy, VolatilityExplosionStrategy,
-                MomentumSurgeStrategy, GridRecoveryStrategy, NewsImpactStrategy
+            # Import God Mode strategies
+            from ..strategies.god_mode_strategies import (
+                GodModeScalpingStrategy,
+                MartingaleGodStrategy,
+                VolatilityGodStrategy,
+                TrendGodStrategy,
+                AllInGodStrategy
             )
+            
+            # Register God Mode strategies
+            self.register_strategy("GOD_MODE_SCALPING", GodModeScalpingStrategy)
+            self.register_strategy("MARTINGALE_GOD", MartingaleGodStrategy)
+            self.register_strategy("VOLATILITY_GOD", VolatilityGodStrategy)
+            self.register_strategy("TREND_GOD", TrendGodStrategy)
+            self.register_strategy("ALL_IN_GOD", AllInGodStrategy)
+            
+            # Import ultra-aggressive strategies
+            from ..strategies.ultra_aggressive_strategies import (
+                AlwaysTradingStrategy,
+                ScalpingMachineStrategy,
+                MomentumBlasterStrategy,
+                VolatilityHunterStrategy,
+                RandomWalkStrategy,
+                AllInStrategy
+            )
+            
+            # Register ultra-aggressive strategies
+            self.register_strategy("ALWAYS_TRADING", AlwaysTradingStrategy)
+            self.register_strategy("SCALPING_MACHINE", ScalpingMachineStrategy)
+            self.register_strategy("MOMENTUM_BLASTER", MomentumBlasterStrategy)
+            self.register_strategy("VOLATILITY_HUNTER", VolatilityHunterStrategy)
+            self.register_strategy("RANDOM_WALK", RandomWalkStrategy)
+            self.register_strategy("ALL_IN", AllInStrategy)
             
             # Register enhanced extreme strategies
             self.register_strategy("EXTREME_SCALPING", ExtremeScalpingStrategy)
             self.register_strategy("NEWS_EXPLOSION", NewsExplosionStrategy)
             self.register_strategy("BREAKOUT_MOMENTUM", BreakoutMomentumStrategy)
-            self.register_strategy("MARTINGALE_EXTREME", MartingaleExtremeStrategy)
-            
-            # Register new extreme leverage strategies
-            self.register_strategy("ULTRA_SCALPING", UltraScalpingStrategy)
-            self.register_strategy("VOLATILITY_EXPLOSION", VolatilityExplosionStrategy)
-            self.register_strategy("MOMENTUM_SURGE", MomentumSurgeStrategy)
-            self.register_strategy("GRID_RECOVERY", GridRecoveryStrategy)
-            self.register_strategy("NEWS_IMPACT", NewsImpactStrategy)          
+            self.register_strategy("MARTINGALE_EXTREME", MartingaleExtremeStrategy)          
         except ImportError:
             # Register the local extreme strategies as fallback
             self.registry.register_strategy('EXTREME_SCALPING', ExtremeScalpingStrategy)
