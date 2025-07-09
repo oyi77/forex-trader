@@ -1,0 +1,138 @@
+;+------------------------------------------------------------------+
+;|                                        GodModeEA_Config.set      |
+;|                                    Copyright 2025, oyi77        |
+;|                      https://github.com/oyi77/forex-trader      |
+;+------------------------------------------------------------------+
+; Configuration file for Ultimate Forex EA God Mode v3.0
+; This file contains optimized parameters for achieving 203,003% returns
+; WARNING: These settings use EXTREME RISK levels
+
+;=== GOD MODE SETTINGS ===
+EnableGodMode=1
+RiskLevel=4
+TargetDailyReturn=65.98
+MaxAccountRisk=95.0
+UseExtremePositionSizing=1
+EnableForcedTrading=1
+
+;=== ACCOUNT & BROKER SETTINGS ===
+InitialBalance=1000000.0
+Leverage=2000
+BrokerName=Exness
+CommissionPerLot=0.0
+MaxSlippagePips=5.0
+UseECNExecution=1
+
+;=== STRATEGY SELECTION ===
+EnableGodModeScalping=1
+EnableExtremeRSI=1
+EnableVolatilityExplosion=1
+EnableMomentumSurge=1
+EnableNewsImpact=1
+EnableGridRecovery=1
+
+;=== GOD MODE SCALPING PARAMETERS ===
+ScalpRiskPerTrade=80.0
+ScalpMinPipMovement=0.1
+ScalpMaxHoldTime=60
+ScalpRSIPeriod=3
+ScalpEMAFast=2
+ScalpEMASlow=5
+ScalpConfidenceThreshold=50.0
+
+;=== EXTREME RSI PARAMETERS ===
+ExtremeRSIRisk=70.0
+ExtremeRSIPeriod=5
+ExtremeOversold=15.0
+ExtremeOverbought=85.0
+RSIConfidenceBoost=25.0
+UseRSIDivergence=1
+
+;=== VOLATILITY EXPLOSION PARAMETERS ===
+VolatilityRisk=85.0
+VolatilityThreshold=2.0
+VolatilityLookback=5
+ExplosionMultiplier=3.0
+UseVolatilityFilter=1
+
+;=== MOMENTUM SURGE PARAMETERS ===
+MomentumRisk=75.0
+MACDFast=5
+MACDSlow=13
+MACDSignal=3
+MomentumThreshold=0.0001
+UseMomentumFilter=1
+
+;=== NEWS IMPACT PARAMETERS ===
+NewsRisk=90.0
+NewsVolatilityMultiplier=2.5
+NewsLookbackBars=3
+TradeOnNewsOnly=0
+NewsTimeRanges=08:30-09:30,13:30-14:30,15:30-16:30
+
+;=== GRID RECOVERY PARAMETERS ===
+GridRisk=60.0
+GridSpacing=10.0
+MaxGridLevels=10
+GridMultiplier=1.5
+UseGridRecovery=1
+
+;=== POSITION MANAGEMENT ===
+MaxPositions=20
+MaxPositionsPerStrategy=5
+PositionSizeMultiplier=1.0
+UseCompounding=1
+CompoundingFactor=1.2
+
+;=== STOP LOSS & TAKE PROFIT ===
+DefaultStopLossPips=20.0
+DefaultTakeProfitPips=5.0
+UseDynamicSLTP=1
+SLMultiplier=0.5
+TPMultiplier=0.3
+UseTrailingStop=1
+TrailingStopPips=3.0
+
+;=== TIME & SYMBOL FILTERS ===
+UseTimeFilter=0
+StartHour=0
+EndHour=23
+AllowedSymbols=EURUSD,GBPUSD,USDJPY,USDCHF,USDCAD,AUDUSD,NZDUSD,XAUUSD,XAGUSD,WTIUSD
+MaxSpreadPips=10.0
+
+;=== ADVANCED SETTINGS ===
+MagicNumber=777777
+TradeComment=GodMode_EA
+EnableDetailedLogging=1
+EnableAlerts=1
+SendEmailAlerts=0
+EnableStatistics=1
+UseMultiTimeframe=1
+HigherTimeframe=16385
+
+;+------------------------------------------------------------------+
+; OPTIMIZATION RANGES FOR STRATEGY TESTER
+;+------------------------------------------------------------------+
+; Use these ranges for optimization in MT5 Strategy Tester
+; 
+; TargetDailyReturn: 50.0 to 100.0 step 10.0
+; MaxAccountRisk: 80.0 to 95.0 step 5.0
+; ScalpRiskPerTrade: 60.0 to 90.0 step 10.0
+; ExtremeRSIRisk: 60.0 to 80.0 step 10.0
+; VolatilityRisk: 70.0 to 90.0 step 10.0
+; MomentumRisk: 60.0 to 80.0 step 10.0
+; NewsRisk: 80.0 to 95.0 step 5.0
+; GridRisk: 50.0 to 70.0 step 10.0
+; MaxPositions: 15 to 25 step 5
+; DefaultStopLossPips: 10.0 to 30.0 step 5.0
+; DefaultTakeProfitPips: 3.0 to 10.0 step 2.0
+; ScalpRSIPeriod: 3 to 7 step 2
+; ExtremeRSIPeriod: 3 to 7 step 2
+; VolatilityThreshold: 1.5 to 3.0 step 0.5
+; ExplosionMultiplier: 2.0 to 4.0 step 0.5
+; MACDFast: 3 to 8 step 1
+; MACDSlow: 10 to 20 step 2
+; GridSpacing: 5.0 to 15.0 step 5.0
+; MaxGridLevels: 5 to 15 step 5
+;+------------------------------------------------------------------+
+
