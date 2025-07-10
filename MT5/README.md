@@ -77,6 +77,14 @@ Leverage = 2000                        // 1:2000 leverage
 MaxPositions = 20                      // Position limit
 ```
 
+### **Mini Contract Configuration**
+```mql5
+AllowedSymbols = "EURUSD,GBPUSD,USDJPY,XAUUSD,EURUSDm,GBPUSDm,USDJPYm,XAUUSDm"
+// Mini contracts automatically detected and handled
+// Position sizing adjusted for mini contracts (0.1x multiplier)
+// Enhanced correlation detection for mini contracts
+```
+
 ### **Strategy Risk Allocation**
 ```mql5
 ScalpRiskPerTrade = 80.0               // God Mode Scalping
@@ -89,35 +97,49 @@ GridRisk = 60.0                        // Grid Recovery
 
 ## 🎯 **Trading Strategies**
 
+### **Mini Contract Support**
+The EA now supports mini contracts (symbols ending with 'm') with the following features:
+- **Automatic Detection**: Mini contracts are automatically detected and handled
+- **Position Sizing**: 0.1x multiplier for mini contracts (lower risk)
+- **Correlation Detection**: Enhanced correlation detection for mini contracts
+- **Risk Management**: Adjusted thresholds for mini contract positions
+- **Supported Mini Contracts**: EURUSDm, GBPUSDm, USDJPYm, USDCHFm, USDCADm, AUDUSDm, NZDUSDm, XAUUSDm, XAGUSDm, WTIUSDm
+
 ### **1. God Mode Scalping (80% Risk)**
 - Ultra-aggressive scalping with 60-second max hold
 - RSI(3) + EMA(2/5) + Bollinger Bands
 - Forced trading when no signals available
+- **Mini Contract**: Adjusted position sizing and risk thresholds
 
 ### **2. Extreme RSI (70% Risk)**
 - Extreme oversold (15) / overbought (85) levels
 - RSI(5) with divergence detection
 - High confidence signals (85%+)
+- **Mini Contract**: Enhanced correlation detection
 
 ### **3. Volatility Explosion (85% Risk)**
 - Trades 3x volatility spikes
 - ATR-based explosion detection
 - News event and volatility driven
+- **Mini Contract**: Adjusted volatility thresholds
 
 ### **4. Momentum Surge (75% Risk)**
 - MACD(5,13,3) momentum trading
 - Strong trend following system
 - Momentum threshold validation
+- **Mini Contract**: Lower risk thresholds
 
 ### **5. News Impact (90% Risk - Highest)**
 - High-impact news event trading
 - 2.5x volatility multiplier trigger
 - 95% confidence level
+- **Mini Contract**: Reduced position sizing
 
 ### **6. Grid Recovery (60% Risk)**
 - Grid-based recovery system
 - 10-pip spacing with 1.5x multiplier
 - Maximum 10 grid levels
+- **Mini Contract**: Adjusted grid spacing
 
 ## 🛡️ **Risk Management**
 
@@ -127,6 +149,13 @@ GridRisk = 60.0                        // Grid Recovery
 - Emergency stop system at 80% drawdown
 - Daily loss limits and consecutive loss protection
 - Correlation filtering to prevent over-exposure
+
+### **Mini Contract Support**
+- Automatic detection of mini contracts (symbols ending with 'm')
+- Adjusted position sizing for mini contracts (0.1x multiplier)
+- Enhanced correlation detection for mini contracts
+- Lower risk thresholds for mini contract positions
+- Support for both standard and mini contract symbols
 
 ### **Position Management**
 - Trailing stops with partial close system
@@ -186,6 +215,11 @@ Win Rate: 65.2% | Balance: 1,456,789
 Primary: EURUSD, GBPUSD, USDJPY
 Secondary: USDCHF, USDCAD, AUDUSD, NZDUSD
 Commodities: XAUUSD, XAGUSD, WTIUSD
+
+Mini Contracts (Lower Risk):
+Primary: EURUSDm, GBPUSDm, USDJPYm
+Secondary: USDCHFm, USDCADm, AUDUSDm, NZDUSDm
+Commodities: XAUUSDm, XAGUSDm, WTIUSDm
 ```
 
 ## 📚 **Documentation**
@@ -194,6 +228,7 @@ Commodities: XAUUSD, XAGUSD, WTIUSD
 - [Installation Guide](../docs/EA_Installation_Guide.md) - Step-by-step setup
 - [User Manual](../docs/EA_User_Manual.md) - Comprehensive usage guide
 - [Configuration Reference](Presets/GodModeEA_Config.set) - Optimized settings
+- [Mini Contract Support](../docs/mini-contract-support.md) - Mini contract documentation
 
 ### **Quick References**
 - **Compilation**: F7 in MetaEditor

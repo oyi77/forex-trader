@@ -351,6 +351,49 @@ private:
         return (m_dailyStartEquity - currentEquity) / m_dailyStartEquity * 100;
     }
     
+    //--- Check if symbol is a mini contract
+    bool IsMiniContract(string symbol)
+    {
+        if(symbol == "")
+            symbol = _Symbol;
+        
+        // Check for 'm' suffix indicating mini contract
+        if(StringFind(symbol, "m") >= 0 && StringLen(symbol) > 0)
+        {
+            string baseSymbol = StringSubstr(symbol, 0, StringLen(symbol) - 1);
+            // Verify it's a valid mini contract by checking if base symbol exists
+            if(SymbolInfoInteger(baseSymbol, SYMBOL_SELECT))
+                return true;
+        }
+        
+        return false;
+    }
+    
+    //--- Get mini contract multiplier (usually 0.1 for mini contracts)
+    double GetMiniContractMultiplier(string symbol)
+    {
+        if(!IsMiniContract(symbol))
+            return 1.0;
+        
+        // Mini contracts typically have 0.1x the value of standard contracts
+        // This can be adjusted based on broker specifications
+        return 0.1;
+    }
+    
+    //--- Get base symbol from mini contract
+    string GetBaseSymbol(string symbol)
+    {
+        if(symbol == "")
+            symbol = _Symbol;
+        
+        if(IsMiniContract(symbol))
+        {
+            return StringSubstr(symbol, 0, StringLen(symbol) - 1);
+        }
+        
+        return symbol;
+    }
+    
     //--- Get pip value for symbol
     double GetPipValue(string symbol)
     {
@@ -362,7 +405,15 @@ private:
         if(StringFind(symbol, "JPY") >= 0)
             pipSize = point * 100;
         
-        return (tickValue / tickSize) * pipSize;
+        double pipValue = (tickValue / tickSize) * pipSize;
+        
+        // Mini contract adjustment
+        if(IsMiniContract(symbol))
+        {
+            pipValue *= GetMiniContractMultiplier(symbol);
+        }
+        
+        return pipValue;
     }
     
     //--- Normalize lot size

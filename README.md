@@ -113,11 +113,18 @@ python scripts/live_trading_system.py --config config/live_config.yaml
 
 ## 📚 Documentation
 
-- [Installation Guide](docs/installation.md)
-- [Configuration Guide](docs/configuration.md)
-- [Strategy Development](docs/strategies.md)
-- [API Reference](docs/api.md)
-- [Troubleshooting](docs/troubleshooting.md)
+Complete documentation is available in the [docs/](docs/) folder:
+
+- **[📖 Documentation Index](docs/README.md)** - Complete documentation overview
+- **[🚀 Quick Start Guide](docs/quick-start.md)** - Get up and running in minutes
+- **[⚙️ Configuration Guide](docs/configuration.md)** - System configuration
+- **[📊 Trading Strategies](docs/strategies.md)** - Strategy development guide
+- **[🎯 EA Installation Guide](docs/EA_Installation_Guide.md)** - MT5 EA setup
+- **[📖 EA User Manual](docs/EA_User_Manual.md)** - Complete EA usage guide
+- **[📈 Mini Contract Support](docs/mini-contract-support.md)** - Mini contract trading
+- **[🛡️ Risk Management](docs/risk-management.md)** - Risk control systems
+- **[🔧 API Reference](docs/api-reference.md)** - Complete API documentation
+- **[❓ Troubleshooting](docs/troubleshooting.md)** - Common issues and solutions
 
 ## 🤝 Contributing
 

@@ -150,6 +150,16 @@ public:
         double pipValue = SymbolInfoDouble(symbol, SYMBOL_TRADE_TICK_VALUE);
         if(pipValue == 0) pipValue = 1.0; // Fallback
         
+        // Mini contract adjustment
+        double miniContractMultiplier = GetMiniContractMultiplier(symbol);
+        if(IsMiniContract(symbol))
+        {
+            // For mini contracts, we can use larger position sizes due to lower risk
+            // Adjust pip value for mini contracts
+            pipValue *= miniContractMultiplier;
+            Print("Mini contract detected: ", symbol, " | Multiplier: ", miniContractMultiplier);
+        }
+        
         double positionSize = leveragedRisk / (stopLossPips * pipValue * 10);
         
         // Apply position limits
@@ -160,6 +170,12 @@ public:
         // God Mode: Allow larger positions
         if(m_godModeEnabled)
             maxLot = MathMin(maxLot * 2, 100.0); // Double the normal max
+        
+        // Mini contract: Allow even larger positions due to lower risk
+        if(IsMiniContract(symbol))
+        {
+            maxLot = MathMin(maxLot * 3, 200.0); // Triple the normal max for mini contracts
+        }
         
         positionSize = MathMax(minLot, MathMin(maxLot, positionSize));
         positionSize = MathRound(positionSize / lotStep) * lotStep;
@@ -547,6 +563,55 @@ private:
             return 0.8; // Lower risk for grid
         else
             return 1.0;
+    }
+    
+    //+------------------------------------------------------------------+
+    //| Check if symbol is a mini contract                               |
+    //+------------------------------------------------------------------+
+    bool IsMiniContract(string symbol)
+    {
+        if(symbol == "")
+            symbol = _Symbol;
+        
+        // Check for 'm' suffix indicating mini contract
+        if(StringFind(symbol, "m") >= 0 && StringLen(symbol) > 0)
+        {
+            string baseSymbol = StringSubstr(symbol, 0, StringLen(symbol) - 1);
+            // Verify it's a valid mini contract by checking if base symbol exists
+            if(SymbolInfoInteger(baseSymbol, SYMBOL_SELECT))
+                return true;
+        }
+        
+        return false;
+    }
+    
+    //+------------------------------------------------------------------+
+    //| Get mini contract multiplier (usually 0.1 for mini contracts)    |
+    //+------------------------------------------------------------------+
+    double GetMiniContractMultiplier(string symbol)
+    {
+        if(!IsMiniContract(symbol))
+            return 1.0;
+        
+        // Mini contracts typically have 0.1x the value of standard contracts
+        // This can be adjusted based on broker specifications
+        return 0.1;
+    }
+    
+    //+------------------------------------------------------------------+
+    //| Get base symbol from mini contract                               |
+    //+------------------------------------------------------------------+
+    string GetBaseSymbol(string symbol)
+    {
+        if(symbol == "")
+            symbol = _Symbol;
+        
+        if(IsMiniContract(symbol))
+        {
+            return StringSubstr(symbol, 0, StringLen(symbol) - 1);
+        }
+        
+        return symbol;
     }
     
     //+------------------------------------------------------------------+

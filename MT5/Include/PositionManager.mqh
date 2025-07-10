@@ -425,10 +425,60 @@ private:
         }
     }
     
+    //--- Check if symbol is a mini contract
+    bool IsMiniContract(string symbol)
+    {
+        if(symbol == "")
+            symbol = _Symbol;
+        
+        // Check for 'm' suffix indicating mini contract
+        if(StringFind(symbol, "m") >= 0 && StringLen(symbol) > 0)
+        {
+            string baseSymbol = StringSubstr(symbol, 0, StringLen(symbol) - 1);
+            // Verify it's a valid mini contract by checking if base symbol exists
+            if(SymbolInfoInteger(baseSymbol, SYMBOL_SELECT))
+                return true;
+        }
+        
+        return false;
+    }
+    
+    //--- Get base symbol from mini contract
+    string GetBaseSymbol(string symbol)
+    {
+        if(symbol == "")
+            symbol = _Symbol;
+        
+        if(IsMiniContract(symbol))
+        {
+            return StringSubstr(symbol, 0, StringLen(symbol) - 1);
+        }
+        
+        return symbol;
+    }
+    
     //--- Check strategy-specific rules
     void CheckStrategySpecificRules(int index, double currentProfit)
     {
         string strategy = m_positions[index].strategy;
+        
+        // Get symbol for mini contract adjustments
+        string symbol = "";
+        if(PositionSelectByTicket(m_positions[index].ticket))
+        {
+            symbol = PositionGetString(POSITION_SYMBOL);
+        }
+        
+        // Mini contract adjustments
+        double profitThreshold = 10.0;
+        double lossThreshold = -50.0;
+        
+        if(IsMiniContract(symbol))
+        {
+            // Mini contracts have lower risk, so adjust thresholds
+            profitThreshold *= 0.5; // Lower profit threshold for mini contracts
+            lossThreshold *= 0.5;   // Lower loss threshold for mini contracts
+        }
         
         // Scalping strategy - quick profit taking
         if(StringFind(strategy, "Scalp") >= 0)
@@ -436,11 +486,11 @@ private:
             if(currentProfit > 0)
             {
                 // Close scalping positions quickly when profitable
-                double profitThreshold = 10.0; // $10 profit threshold
                 if(currentProfit > profitThreshold)
                 {
                     m_trade.PositionClose(m_positions[index].ticket);
-                    Print("Scalping position closed at profit: ", currentProfit);
+                    Print("Scalping position closed at profit: ", currentProfit, 
+                          " | Symbol: ", symbol, " | Mini: ", IsMiniContract(symbol));
                 }
             }
         }
@@ -449,10 +499,11 @@ private:
         if(StringFind(strategy, "News") >= 0)
         {
             // Close news positions if they turn negative quickly
-            if(currentProfit < -50.0) // $50 loss threshold
+            if(currentProfit < lossThreshold)
             {
                 m_trade.PositionClose(m_positions[index].ticket);
-                Print("News position closed at loss: ", currentProfit);
+                Print("News position closed at loss: ", currentProfit,
+                      " | Symbol: ", symbol, " | Mini: ", IsMiniContract(symbol));
             }
         }
         

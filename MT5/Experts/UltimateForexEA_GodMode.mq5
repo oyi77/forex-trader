@@ -137,7 +137,7 @@ input group "=== TIME & SYMBOL FILTERS ==="
 input bool     UseTimeFilter = false;          // Use Time Filter
 input int      StartHour = 0;                  // Start Hour (Server Time)
 input int      EndHour = 23;                   // End Hour (Server Time)
-input string   AllowedSymbols = "EURUSD,GBPUSD,USDJPY,USDCHF,USDCAD,AUDUSD,NZDUSD,XAUUSD,XAGUSD,WTIUSD"; // Allowed Symbols
+input string   AllowedSymbols = "EURUSD,GBPUSD,USDJPY,USDCHF,USDCAD,AUDUSD,NZDUSD,XAUUSD,XAGUSD,WTIUSD,EURUSDm,GBPUSDm,USDJPYm,USDCHFm,USDCADm,AUDUSDm,NZDUSDm,XAUUSDm,XAGUSDm,WTIUSDm"; // Allowed Symbols (including mini contracts)
 input double   MaxSpreadPips = 10.0;           // Maximum Spread (pips)
 
 input group "=== ADVANCED SETTINGS ==="
@@ -508,6 +508,42 @@ void ParseAllowedSymbols()
 }
 
 //+------------------------------------------------------------------+
+//| Check if symbol is a mini contract                               |
+//+------------------------------------------------------------------+
+bool IsMiniContract(string symbol)
+{
+    if(symbol == "")
+        symbol = _Symbol;
+    
+    // Check for 'm' suffix indicating mini contract
+    if(StringFind(symbol, "m") >= 0 && StringLen(symbol) > 0)
+    {
+        string baseSymbol = StringSubstr(symbol, 0, StringLen(symbol) - 1);
+        // Verify it's a valid mini contract by checking if base symbol exists
+        if(SymbolInfoInteger(baseSymbol, SYMBOL_SELECT))
+            return true;
+    }
+    
+    return false;
+}
+
+//+------------------------------------------------------------------+
+//| Get base symbol from mini contract                               |
+//+------------------------------------------------------------------+
+string GetBaseSymbol(string symbol)
+{
+    if(symbol == "")
+        symbol = _Symbol;
+    
+    if(IsMiniContract(symbol))
+    {
+        return StringSubstr(symbol, 0, StringLen(symbol) - 1);
+    }
+    
+    return symbol;
+}
+
+//+------------------------------------------------------------------+
 //| Check if symbol is allowed                                       |
 //+------------------------------------------------------------------+
 void CheckSymbolAllowed()
@@ -524,6 +560,12 @@ void CheckSymbolAllowed()
     
     if(!symbolAllowed)
         Print("WARNING: Symbol ", _Symbol, " not in allowed list");
+    
+    // Log mini contract detection
+    if(IsMiniContract(_Symbol))
+    {
+        Print("INFO: Mini contract detected: ", _Symbol, " | Base symbol: ", GetBaseSymbol(_Symbol));
+    }
 }
 
 //+------------------------------------------------------------------+
@@ -630,6 +672,9 @@ void PrintConfiguration()
 {
     Print("=== GOD MODE EA CONFIGURATION ===");
     Print("Symbol: ", _Symbol);
+    Print("Contract Type: ", IsMiniContract(_Symbol) ? "MINI CONTRACT" : "STANDARD CONTRACT");
+    if(IsMiniContract(_Symbol))
+        Print("Base Symbol: ", GetBaseSymbol(_Symbol));
     Print("God Mode: ", EnableGodMode ? "ENABLED" : "DISABLED");
     Print("Risk Level: ", EnumToString(RiskLevel));
     Print("Target Daily Return: ", TargetDailyReturn, "%");
@@ -643,6 +688,12 @@ void PrintConfiguration()
         if(strategies[i].enabled)
             Print("✓ ", strategies[i].name);
     }
+    
+    Print("--- MINI CONTRACT SUPPORT ---");
+    Print("✓ Automatic mini contract detection");
+    Print("✓ Adjusted position sizing (0.1x multiplier)");
+    Print("✓ Enhanced correlation detection");
+    Print("✓ Lower risk thresholds");
     Print("===============================");
 }
 

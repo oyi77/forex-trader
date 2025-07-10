@@ -748,6 +748,42 @@ private:
     }
     
     //+------------------------------------------------------------------+
+    //| Check if symbol is a mini contract                               |
+    //+------------------------------------------------------------------+
+    bool IsMiniContract(string symbol)
+    {
+        if(symbol == "")
+            symbol = _Symbol;
+        
+        // Check for 'm' suffix indicating mini contract
+        if(StringFind(symbol, "m") >= 0 && StringLen(symbol) > 0)
+        {
+            string baseSymbol = StringSubstr(symbol, 0, StringLen(symbol) - 1);
+            // Verify it's a valid mini contract by checking if base symbol exists
+            if(SymbolInfoInteger(baseSymbol, SYMBOL_SELECT))
+                return true;
+        }
+        
+        return false;
+    }
+    
+    //+------------------------------------------------------------------+
+    //| Get base symbol from mini contract                               |
+    //+------------------------------------------------------------------+
+    string GetBaseSymbol(string symbol)
+    {
+        if(symbol == "")
+            symbol = _Symbol;
+        
+        if(IsMiniContract(symbol))
+        {
+            return StringSubstr(symbol, 0, StringLen(symbol) - 1);
+        }
+        
+        return symbol;
+    }
+    
+    //+------------------------------------------------------------------+
     //| Check if two symbols are correlated                            |
     //+------------------------------------------------------------------+
     bool IsCorrelatedPair(string symbol1, string symbol2)
@@ -756,15 +792,23 @@ private:
         if(symbol1 == symbol2)
             return true;
         
+        // Get base symbols for mini contracts
+        string baseSymbol1 = GetBaseSymbol(symbol1);
+        string baseSymbol2 = GetBaseSymbol(symbol2);
+        
+        // Check if base symbols are the same (for mini contracts)
+        if(baseSymbol1 == baseSymbol2)
+            return true;
+        
         // EUR pairs correlation
-        if((StringFind(symbol1, "EUR") >= 0 && StringFind(symbol2, "EUR") >= 0) ||
-           (StringFind(symbol1, "GBP") >= 0 && StringFind(symbol2, "GBP") >= 0) ||
-           (StringFind(symbol1, "USD") >= 0 && StringFind(symbol2, "USD") >= 0))
+        if((StringFind(baseSymbol1, "EUR") >= 0 && StringFind(baseSymbol2, "EUR") >= 0) ||
+           (StringFind(baseSymbol1, "GBP") >= 0 && StringFind(baseSymbol2, "GBP") >= 0) ||
+           (StringFind(baseSymbol1, "USD") >= 0 && StringFind(baseSymbol2, "USD") >= 0))
             return true;
         
         // Commodity correlation
-        if((StringFind(symbol1, "XAU") >= 0 && StringFind(symbol2, "XAG") >= 0) ||
-           (StringFind(symbol1, "XAG") >= 0 && StringFind(symbol2, "XAU") >= 0))
+        if((StringFind(baseSymbol1, "XAU") >= 0 && StringFind(baseSymbol2, "XAG") >= 0) ||
+           (StringFind(baseSymbol1, "XAG") >= 0 && StringFind(baseSymbol2, "XAU") >= 0))
             return true;
         
         return false;
