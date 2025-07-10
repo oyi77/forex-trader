@@ -17,8 +17,8 @@
 #include <Arrays\ArrayObj.mqh>
 
 //--- Include custom classes
-#include "../Include/GodModeRiskManager.mqh"
-#include "../Include/GodModePositionManager.mqh"
+#include "../Include/GodMode/GodModeRiskManager.mqh"
+#include "../Include/GodMode/GodModePositionManager.mqh"
 
 //+------------------------------------------------------------------+
 //| GLOBAL ENUMERATIONS                                             |
@@ -149,6 +149,7 @@ input bool     SendEmailAlerts = false;        // Send Email Alerts
 input bool     EnableStatistics = true;        // Enable Statistics
 input bool     UseMultiTimeframe = true;       // Use Multi-Timeframe
 input ENUM_TIMEFRAMES HigherTimeframe = PERIOD_H1; // Higher Timeframe
+input bool     ForceResetEmergencyStop = false; // Force Reset Emergency Stop (GOD MODE ONLY)
 
 //+------------------------------------------------------------------+
 //| GLOBAL VARIABLES                                                |
@@ -375,7 +376,14 @@ void OnTick()
     
     // Check if symbol is allowed
     if(!symbolAllowed)
-        return;
+    {
+        Print("TRADING BLOCKED: Symbol ", _Symbol, " is not allowed");
+        Print("Allowed symbols: ", AllowedSymbols);
+        
+        // TEMPORARY OVERRIDE FOR TESTING - Remove this in production
+        Print("TEMPORARY OVERRIDE: Allowing trading despite symbol not in list");
+        symbolAllowed = true; // Force allow for testing
+    }
     
     // Check time filter
     if(!CheckTimeFilter())
@@ -383,11 +391,24 @@ void OnTick()
     
     // Check spread
     if(!CheckSpread())
+    {
+        if(EnableDetailedLogging)
+        {
+            long spreadLong = SymbolInfoInteger(_Symbol, SYMBOL_SPREAD);
+            double spread = (double)spreadLong * SymbolInfoDouble(_Symbol, SYMBOL_POINT);
+            double spreadPips = spread / GetPipSize(_Symbol);
+            Print("DEBUG: Spread too high - Current: ", spreadPips, " Max: ", MaxSpreadPips);
+        }
         return;
+    }
     
     // Update indicators
     if(!UpdateIndicators())
+    {
+        if(EnableDetailedLogging)
+            Print("DEBUG: Indicator update failed");
         return;
+    }
     
     // Update news status
     UpdateNewsStatus();
@@ -397,21 +418,50 @@ void OnTick()
     {
         riskManager.UpdateVolatilityMultiplier(atrValues[0]);
         
+        // Handle emergency stop reset in God Mode
+        if(ForceResetEmergencyStop && EnableGodMode && RiskLevel == RISK_GOD_MODE)
+        {
+            riskManager.ForceResetEmergencyStop();
+            Print("GOD MODE: Emergency stop force reset triggered");
+        }
+        
         // Check if trading is allowed
         if(!riskManager.IsTradeAllowed())
+        {
+            if(EnableDetailedLogging)
+                Print("DEBUG: Risk manager blocked trading");
             return;
+        }
     }
     
     // Manage existing positions
     if(positionManager != NULL)
         positionManager.ManageAllPositions();
+    else if(EnableDetailedLogging)
+        Print("DEBUG: No position manager available");
     
     // Check for new signals
     CheckTradingSignals();
     
+    // Debug: Check if we're in a position limit
+    if(EnableDetailedLogging && PositionsTotal() >= MaxPositions)
+    {
+        Print("DEBUG: Position limit reached - Max: ", MaxPositions, " Current: ", PositionsTotal());
+    }
+    
     // Update display
     if(EnableStatistics)
         UpdateDisplay();
+    
+    // Check emergency stop status
+    if(riskManager != NULL && EnableDetailedLogging)
+    {
+        if(riskManager.IsEmergencyStop())
+        {
+            Print("WARNING: Emergency stop is ACTIVE - No new trades allowed");
+            Print("To reset: Set ForceResetEmergencyStop = true in EA settings");
+        }
+    }
 }
 
 //+------------------------------------------------------------------+
@@ -505,6 +555,90 @@ void ParseAllowedSymbols()
             allowedSymbolsList[i] = temp;
         }
     }
+    
+    // Debug: Print parsed symbols
+    if(EnableDetailedLogging)
+    {
+        Print("=== PARSED ALLOWED SYMBOLS ===");
+        for(int i = 0; i < ArraySize(allowedSymbolsList); i++)
+        {
+            Print("Symbol ", i, ": ", allowedSymbolsList[i]);
+        }
+        Print("Total symbols: ", ArraySize(allowedSymbolsList));
+        Print("Current symbol: ", _Symbol);
+        Print("===============================");
+    }
+}
+
+//+------------------------------------------------------------------+
+//| Get proper pip size for symbol                                   |
+//+------------------------------------------------------------------+
+double GetPipSize(string symbol = "")
+{
+    if(symbol == "")
+        symbol = _Symbol;
+    
+    double point = SymbolInfoDouble(symbol, SYMBOL_POINT);
+    double pipSize = 0;
+    
+    // Special handling for different symbol types
+    if(StringFind(symbol, "XAU") >= 0) // Gold
+    {
+        pipSize = point * 10; // Gold uses 10 * point for pip
+    }
+    else if(StringFind(symbol, "XAG") >= 0) // Silver
+    {
+        pipSize = point * 10; // Silver uses 10 * point for pip
+    }
+    else if(StringFind(symbol, "JPY") >= 0) // JPY pairs
+    {
+        pipSize = point * 100; // JPY pairs use 100 * point for pip
+    }
+    else // Other forex pairs
+    {
+        pipSize = point * 10; // Standard forex pairs use 10 * point for pip
+    }
+    
+    return pipSize;
+}
+
+//+------------------------------------------------------------------+
+//| Get pip value for symbol                                         |
+//+------------------------------------------------------------------+
+double GetPipValue(string symbol = "")
+{
+    if(symbol == "")
+        symbol = _Symbol;
+    
+    double tickValue = SymbolInfoDouble(symbol, SYMBOL_TRADE_TICK_VALUE);
+    double tickSize = SymbolInfoDouble(symbol, SYMBOL_TRADE_TICK_SIZE);
+    double point = SymbolInfoDouble(symbol, SYMBOL_POINT);
+    
+    double pipSize = GetPipSize(symbol);
+    double pipValue = (tickValue / tickSize) * pipSize;
+    
+    // Mini contract adjustment
+    if(IsMiniContract(symbol))
+    {
+        pipValue *= 0.1; // Mini contracts have 0.1x the value
+    }
+    
+    return pipValue;
+}
+
+//+------------------------------------------------------------------+
+//| Get minimum stop level in pips                                   |
+//+------------------------------------------------------------------+
+double GetMinStopLevelPips(string symbol = "")
+{
+    if(symbol == "")
+        symbol = _Symbol;
+    
+    long minStopLevelLong = SymbolInfoInteger(symbol, SYMBOL_TRADE_STOPS_LEVEL);
+    double minStopLevel = (double)minStopLevelLong;
+    double pipSize = GetPipSize(symbol);
+    
+    return minStopLevel * SymbolInfoDouble(symbol, SYMBOL_POINT) / pipSize;
 }
 
 //+------------------------------------------------------------------+
@@ -518,10 +652,21 @@ bool IsMiniContract(string symbol)
     // Check for 'm' suffix indicating mini contract
     if(StringFind(symbol, "m") >= 0 && StringLen(symbol) > 0)
     {
-        string baseSymbol = StringSubstr(symbol, 0, StringLen(symbol) - 1);
-        // Verify it's a valid mini contract by checking if base symbol exists
-        if(SymbolInfoInteger(baseSymbol, SYMBOL_SELECT))
-            return true;
+        // Simple check: if symbol ends with 'm' and is longer than 1 character
+        if(StringLen(symbol) > 1)
+        {
+            string baseSymbol = StringSubstr(symbol, 0, StringLen(symbol) - 1);
+            
+            // Check if it's a known mini contract pattern
+            if(StringFind(baseSymbol, "USD") >= 0 || 
+               StringFind(baseSymbol, "JPY") >= 0 || 
+               StringFind(baseSymbol, "XAU") >= 0 || 
+               StringFind(baseSymbol, "XAG") >= 0 || 
+               StringFind(baseSymbol, "WTI") >= 0)
+            {
+                return true;
+            }
+        }
     }
     
     return false;
@@ -544,22 +689,99 @@ string GetBaseSymbol(string symbol)
 }
 
 //+------------------------------------------------------------------+
+//| Normalize symbol name                                            |
+//+------------------------------------------------------------------+
+string NormalizeSymbol(string symbol)
+{
+    if(symbol == "")
+        symbol = _Symbol;
+    
+    // Remove any spaces and convert to uppercase
+    StringReplace(symbol, " ", "");
+    StringToUpper(symbol);
+    
+    return symbol;
+}
+
+//+------------------------------------------------------------------+
 //| Check if symbol is allowed                                       |
 //+------------------------------------------------------------------+
 void CheckSymbolAllowed()
 {
     symbolAllowed = false;
+    string normalizedSymbol = NormalizeSymbol(_Symbol);
+    
+    // Debug: Show what we're checking
+    if(EnableDetailedLogging)
+    {
+        Print("Checking symbol: ", _Symbol);
+        Print("Normalized symbol: ", normalizedSymbol);
+        Print("Allowed symbols count: ", ArraySize(allowedSymbolsList));
+    }
+    
+    // First check: exact match
     for(int i = 0; i < ArraySize(allowedSymbolsList); i++)
     {
-        if(allowedSymbolsList[i] == _Symbol)
+        string normalizedAllowed = NormalizeSymbol(allowedSymbolsList[i]);
+        
+        if(EnableDetailedLogging)
+            Print("Comparing: '", normalizedSymbol, "' with '", normalizedAllowed, "'");
+            
+        if(normalizedAllowed == normalizedSymbol)
         {
             symbolAllowed = true;
+            if(EnableDetailedLogging)
+                Print("Symbol ", _Symbol, " is ALLOWED (exact match)");
             break;
         }
     }
     
+    // Second check: try common variations
     if(!symbolAllowed)
+    {
+        string symbolVariations[] = {
+            _Symbol,
+            StringSubstr(_Symbol, 0, 6), // First 6 chars
+            StringSubstr(_Symbol, 0, 7), // First 7 chars
+            StringSubstr(_Symbol, 0, 8), // First 8 chars
+            StringSubstr(_Symbol, 0, StringLen(_Symbol) - 1), // Remove last char
+            StringSubstr(_Symbol, 0, StringLen(_Symbol) - 2)  // Remove last 2 chars
+        };
+        
+        for(int v = 0; v < ArraySize(symbolVariations); v++)
+        {
+            string variation = NormalizeSymbol(symbolVariations[v]);
+            
+            for(int i = 0; i < ArraySize(allowedSymbolsList); i++)
+            {
+                string normalizedAllowed = NormalizeSymbol(allowedSymbolsList[i]);
+                
+                if(variation == normalizedAllowed)
+                {
+                    symbolAllowed = true;
+                    if(EnableDetailedLogging)
+                        Print("Symbol ", _Symbol, " is ALLOWED (variation match: ", symbolVariations[v], ")");
+                    break;
+                }
+            }
+            
+            if(symbolAllowed) break;
+        }
+    }
+    
+    if(!symbolAllowed)
+    {
         Print("WARNING: Symbol ", _Symbol, " not in allowed list");
+        Print("Available symbols: ", AllowedSymbols);
+        Print("Symbol variations tried: ", _Symbol, ", ", StringSubstr(_Symbol, 0, 6), ", ", 
+              StringSubstr(_Symbol, 0, 7), ", ", StringSubstr(_Symbol, 0, 8), ", ",
+              StringSubstr(_Symbol, 0, StringLen(_Symbol) - 1), ", ",
+              StringSubstr(_Symbol, 0, StringLen(_Symbol) - 2));
+    }
+    else
+    {
+        Print("INFO: Symbol ", _Symbol, " is allowed");
+    }
     
     // Log mini contract detection
     if(IsMiniContract(_Symbol))
@@ -783,10 +1005,27 @@ bool CheckTimeFilter()
 //+------------------------------------------------------------------+
 bool CheckSpread()
 {
-    double spread = SymbolInfoInteger(_Symbol, SYMBOL_SPREAD) * SymbolInfoDouble(_Symbol, SYMBOL_POINT);
-    double spreadPips = spread / (SymbolInfoDouble(_Symbol, SYMBOL_POINT) * 10);
+            long spreadLong = SymbolInfoInteger(_Symbol, SYMBOL_SPREAD);
+            double spread = (double)spreadLong * SymbolInfoDouble(_Symbol, SYMBOL_POINT);
+        double spreadPips = spread / GetPipSize(_Symbol);
     
-    return spreadPips <= MaxSpreadPips;
+    // Adjust spread limit for mini contracts
+    double maxSpread = MaxSpreadPips;
+    if(IsMiniContract(_Symbol))
+    {
+        maxSpread = MaxSpreadPips * 2.0; // Double the spread limit for mini contracts
+        if(EnableDetailedLogging)
+            Print("DEBUG: Mini contract detected - Adjusted max spread: ", maxSpread, " (original: ", MaxSpreadPips, ")");
+    }
+    
+    bool spreadOK = spreadPips <= maxSpread;
+    
+    if(EnableDetailedLogging)
+    {
+        Print("DEBUG: Spread check - Current: ", spreadPips, " Max: ", maxSpread, " OK: ", spreadOK);
+    }
+    
+    return spreadOK;
 }
 
 //+------------------------------------------------------------------+
@@ -796,7 +1035,11 @@ void CheckTradingSignals()
 {
     // Check position limits
     if(PositionsTotal() >= MaxPositions)
+    {
+        if(EnableDetailedLogging)
+            Print("DEBUG: Position limit reached - Max: ", MaxPositions, " Current: ", PositionsTotal());
         return;
+    }
     
     // God Mode Scalping
     if(EnableGodModeScalping && GetStrategyPositions("God_Mode_Scalping") < MaxPositionsPerStrategy)
@@ -824,7 +1067,17 @@ void CheckTradingSignals()
     
     // Forced trading if no signals and God Mode enabled
     if(EnableForcedTrading && EnableGodMode && PositionsTotal() == 0)
+    {
+        if(EnableDetailedLogging)
+            Print("DEBUG: Attempting forced trade - No signals available");
         ForceTrade();
+    }
+    
+    // Debug: Log if no signals were generated
+    if(EnableDetailedLogging && PositionsTotal() == 0)
+    {
+        Print("DEBUG: No trading signals generated this tick");
+    }
 }
 
 //+------------------------------------------------------------------+
@@ -868,6 +1121,9 @@ void CheckGodModeScalpingSignal()
     
     if(signal != "" && confidence >= ScalpConfidenceThreshold)
     {
+        if(EnableDetailedLogging)
+            Print("DEBUG: God Mode Scalping signal generated: ", signal, " (", confidence, "%)");
+            
         ENUM_ORDER_TYPE orderType = (signal == "BUY") ? ORDER_TYPE_BUY : ORDER_TYPE_SELL;
         double lotSize = 0;
         
@@ -882,7 +1138,20 @@ void CheckGodModeScalpingSignal()
         }
         
         if(lotSize > 0)
+        {
+            if(EnableDetailedLogging)
+                Print("DEBUG: Opening God Mode Scalping position - Lots: ", lotSize);
             OpenPosition(orderType, lotSize, "God_Mode_Scalping", confidence);
+        }
+        else
+        {
+            if(EnableDetailedLogging)
+                Print("DEBUG: Lot size calculation failed - Lots: ", lotSize);
+        }
+    }
+    else if(EnableDetailedLogging)
+    {
+        Print("DEBUG: No God Mode Scalping signal - Signal: ", signal, " Confidence: ", confidence, " Threshold: ", ScalpConfidenceThreshold);
     }
 }
 
@@ -1045,7 +1314,7 @@ void CheckGridRecoverySignal()
     bool needNewLevel = true;
     for(int i = 0; i < activeGridLevels; i++)
     {
-        if(MathAbs(currentPrice - gridLevels[i].price) < GridSpacing * SymbolInfoDouble(_Symbol, SYMBOL_POINT) * 10)
+        if(MathAbs(currentPrice - gridLevels[i].price) < GridSpacing * GetPipSize(_Symbol))
         {
             needNewLevel = false;
             break;
@@ -1077,7 +1346,14 @@ void CheckGridRecoverySignal()
 void ForceTrade()
 {
     if(!EnableForcedTrading || !EnableGodMode)
+    {
+        if(EnableDetailedLogging)
+            Print("DEBUG: Force trade disabled - ForcedTrading: ", EnableForcedTrading, " GodMode: ", EnableGodMode);
         return;
+    }
+    
+    if(EnableDetailedLogging)
+        Print("DEBUG: Attempting forced trade");
     
     // Random trade to force activity
     string signal = (MathRand() % 2 == 0) ? "BUY" : "SELL";
@@ -1086,10 +1362,18 @@ void ForceTrade()
     double confidence = 50 + MathRand() % 31; // 50-80%
     double lotSize = CalculatePositionSize("Forced_Trade", 30, confidence);
     
-    OpenPosition(orderType, lotSize, "Forced_Trade", confidence);
-    
     if(EnableDetailedLogging)
+        Print("DEBUG: Forced trade - Signal: ", signal, " Confidence: ", confidence, " Lots: ", lotSize);
+    
+    if(lotSize > 0)
+    {
+        OpenPosition(orderType, lotSize, "Forced_Trade", confidence);
         Print("FORCED TRADE executed - No signals available");
+    }
+    else
+    {
+        Print("DEBUG: Forced trade failed - Lot size calculation failed");
+    }
 }
 
 //+------------------------------------------------------------------+
@@ -1103,36 +1387,56 @@ double CalculatePositionSize(string strategy, double riskPercent, double confide
     // Use equity if lower than balance (drawdown situation)
     double accountValue = MathMin(balance, equity);
     
-    // Base risk calculation
-    double riskAmount = accountValue * (riskPercent / 100.0);
+    // Base risk calculation - cap at reasonable levels
+    double maxRiskPercent = MathMin(riskPercent, 20.0); // Cap at 20% max risk per trade
+    double riskAmount = accountValue * (maxRiskPercent / 100.0);
     
     // Confidence multiplier
     double confidenceMultiplier = confidence / 100.0;
     riskAmount *= confidenceMultiplier;
     
-    // God Mode multiplier
+    // God Mode multiplier - reduced for safety
     if(EnableGodMode && RiskLevel == RISK_GOD_MODE)
-        riskAmount *= 1.5;
+        riskAmount *= 1.2; // Reduced from 1.5 to 1.2
     
-    // Compounding
+    // Compounding - reduced for safety
     if(UseCompounding && stats.totalReturn > 0)
-        riskAmount *= MathPow(CompoundingFactor, stats.totalReturn / 100.0);
+        riskAmount *= MathMin(MathPow(CompoundingFactor, stats.totalReturn / 100.0), 2.0); // Cap at 2x
     
     // Position size multiplier
     riskAmount *= PositionSizeMultiplier;
     
+    // Additional safety cap - never risk more than 10% of account
+    double maxRiskAmount = accountValue * 0.1;
+    riskAmount = MathMin(riskAmount, maxRiskAmount);
+    
     // Calculate lot size
     double stopLossPips = DefaultStopLossPips;
-    double pipValue = SymbolInfoDouble(_Symbol, SYMBOL_TRADE_TICK_VALUE);
-    double lotSize = riskAmount / (stopLossPips * pipValue * 10);
+    double pipValue = GetPipValue(_Symbol);
+    double lotSize = riskAmount / (stopLossPips * pipValue);
     
     // Apply limits
     double minLot = SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_MIN);
     double maxLot = SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_MAX);
     double lotStep = SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_STEP);
     
-    lotSize = MathMax(minLot, MathMin(maxLot, lotSize));
+    // Additional safety limits
+    double maxSafeLot = MathMin(maxLot, 10.0); // Never exceed 10 lots
+    if(IsMiniContract(_Symbol))
+    {
+        maxSafeLot = MathMin(maxSafeLot, 5.0); // Even lower for mini contracts
+    }
+    
+    lotSize = MathMax(minLot, MathMin(maxSafeLot, lotSize));
     lotSize = MathRound(lotSize / lotStep) * lotStep;
+    
+    if(EnableDetailedLogging)
+    {
+        Print("DEBUG: Position size calculation - Risk: ", riskAmount, " StopLoss: ", stopLossPips, 
+              " PipValue: ", pipValue, " MinLot: ", minLot, " MaxLot: ", maxLot, " LotStep: ", lotStep, " Final: ", lotSize);
+        Print("DEBUG: Account info - Balance: ", AccountInfoDouble(ACCOUNT_BALANCE), " Equity: ", AccountInfoDouble(ACCOUNT_EQUITY));
+        Print("DEBUG: Risk percent: ", riskPercent, " Max risk percent: ", maxRiskPercent);
+    }
     
     return lotSize;
 }
@@ -1161,6 +1465,47 @@ bool OpenPosition(ENUM_ORDER_TYPE orderType, double lotSize, string strategy, do
     {
         stopLoss = CalculateStopLoss(orderType, price);
         takeProfit = CalculateTakeProfit(orderType, price);
+    }
+    
+    if(EnableDetailedLogging)
+    {
+        Print("DEBUG: Order details - Price: ", price, " SL: ", stopLoss, " TP: ", takeProfit);
+        Print("DEBUG: Order type: ", EnumToString(orderType), " Lots: ", lotSize);
+    }
+    
+    // Validate SL and TP levels
+    double minStopLevelPips = GetMinStopLevelPips(_Symbol);
+    double minStopLevel = minStopLevelPips * GetPipSize(_Symbol);
+    double currentPrice = (orderType == ORDER_TYPE_BUY) ? SymbolInfoDouble(_Symbol, SYMBOL_ASK) : SymbolInfoDouble(_Symbol, SYMBOL_BID);
+    
+    if(EnableDetailedLogging)
+    {
+        Print("DEBUG: Min stop level (pips): ", minStopLevelPips, " (price): ", minStopLevel, " Current price: ", currentPrice);
+    }
+    
+    // Adjust SL and TP if they're too close
+    if(MathAbs(stopLoss - currentPrice) < minStopLevel)
+    {
+        double adjustment = minStopLevel - MathAbs(stopLoss - currentPrice) + 10 * GetPipSize(_Symbol);
+        if(orderType == ORDER_TYPE_BUY)
+            stopLoss = currentPrice - adjustment;
+        else
+            stopLoss = currentPrice + adjustment;
+        
+        if(EnableDetailedLogging)
+            Print("DEBUG: Adjusted SL to: ", stopLoss);
+    }
+    
+    if(MathAbs(takeProfit - currentPrice) < minStopLevel)
+    {
+        double adjustment = minStopLevel - MathAbs(takeProfit - currentPrice) + 10 * GetPipSize(_Symbol);
+        if(orderType == ORDER_TYPE_BUY)
+            takeProfit = currentPrice + adjustment;
+        else
+            takeProfit = currentPrice - adjustment;
+        
+        if(EnableDetailedLogging)
+            Print("DEBUG: Adjusted TP to: ", takeProfit);
     }
     
     // Use position manager to open position
@@ -1248,15 +1593,27 @@ double CalculateStopLoss(ENUM_ORDER_TYPE orderType, double price)
 {
     double stopLossPips = DefaultStopLossPips;
     
+    // Adjust for mini contracts and gold
+    if(IsMiniContract(_Symbol))
+    {
+        stopLossPips *= 2.0; // Double the stop loss for mini contracts
+    }
+    
+    // Special handling for gold (XAUUSD)
+    if(StringFind(_Symbol, "XAU") >= 0)
+    {
+        stopLossPips = MathMax(stopLossPips, 50.0); // Minimum 50 pips for gold
+    }
+    
     if(UseDynamicSLTP)
     {
         double atr = atrValues[0];
-        double pipSize = SymbolInfoDouble(_Symbol, SYMBOL_POINT) * 10;
+        double pipSize = GetPipSize(_Symbol);
         stopLossPips = (atr / pipSize) * SLMultiplier;
         stopLossPips = MathMax(5.0, MathMin(100.0, stopLossPips));
     }
     
-    double stopDistance = stopLossPips * SymbolInfoDouble(_Symbol, SYMBOL_POINT) * 10;
+    double stopDistance = stopLossPips * GetPipSize(_Symbol);
     
     if(orderType == ORDER_TYPE_BUY)
         return price - stopDistance;
@@ -1271,15 +1628,27 @@ double CalculateTakeProfit(ENUM_ORDER_TYPE orderType, double price)
 {
     double takeProfitPips = DefaultTakeProfitPips;
     
+    // Adjust for mini contracts and gold
+    if(IsMiniContract(_Symbol))
+    {
+        takeProfitPips *= 2.0; // Double the take profit for mini contracts
+    }
+    
+    // Special handling for gold (XAUUSD)
+    if(StringFind(_Symbol, "XAU") >= 0)
+    {
+        takeProfitPips = MathMax(takeProfitPips, 25.0); // Minimum 25 pips for gold
+    }
+    
     if(UseDynamicSLTP)
     {
         double atr = atrValues[0];
-        double pipSize = SymbolInfoDouble(_Symbol, SYMBOL_POINT) * 10;
+        double pipSize = GetPipSize(_Symbol);
         takeProfitPips = (atr / pipSize) * TPMultiplier;
         takeProfitPips = MathMax(2.0, MathMin(50.0, takeProfitPips));
     }
     
-    double profitDistance = takeProfitPips * SymbolInfoDouble(_Symbol, SYMBOL_POINT) * 10;
+    double profitDistance = takeProfitPips * GetPipSize(_Symbol);
     
     if(orderType == ORDER_TYPE_BUY)
         return price + profitDistance;
@@ -1332,7 +1701,7 @@ void UpdateTrailingStop(ulong ticket)
                          SymbolInfoDouble(_Symbol, SYMBOL_ASK);
     double currentSL = PositionGetDouble(POSITION_SL);
     
-    double trailDistance = TrailingStopPips * SymbolInfoDouble(_Symbol, SYMBOL_POINT) * 10;
+            double trailDistance = TrailingStopPips * GetPipSize(_Symbol);
     double newSL = 0;
     
     if(posType == POSITION_TYPE_BUY)

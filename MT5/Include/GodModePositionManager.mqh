@@ -563,7 +563,7 @@ private:
     //+------------------------------------------------------------------+
     void UpdateTrailingStop(int index)
     {
-        double pipSize = SymbolInfoDouble(m_positions[index].symbol, SYMBOL_POINT) * 10;
+        double pipSize = GetPipSize(m_positions[index].symbol);
         double trailDistance = m_trailingStopPips * pipSize;
         double stepDistance = m_trailingStepPips * pipSize;
         double startDistance = m_trailingStartPips * pipSize;
@@ -633,7 +633,7 @@ private:
     //+------------------------------------------------------------------+
     void CheckPartialClose(int index)
     {
-        double pipSize = SymbolInfoDouble(m_positions[index].symbol, SYMBOL_POINT) * 10;
+        double pipSize = GetPipSize(m_positions[index].symbol);
         double profitPips = 0;
         
         if(m_positions[index].type == POSITION_TYPE_BUY)
@@ -680,7 +680,7 @@ private:
     //+------------------------------------------------------------------+
     void CheckProfitProtection(int index)
     {
-        double pipSize = SymbolInfoDouble(m_positions[index].symbol, SYMBOL_POINT) * 10;
+        double pipSize = GetPipSize(m_positions[index].symbol);
         double profitPips = 0;
         
         if(m_positions[index].type == POSITION_TYPE_BUY)
@@ -745,6 +745,38 @@ private:
         }
         
         return sameDirectionCount < 3; // Allow max 3 correlated positions
+    }
+    
+    //+------------------------------------------------------------------+
+    //| Get proper pip size for symbol                                   |
+    //+------------------------------------------------------------------+
+    double GetPipSize(string symbol)
+    {
+        if(symbol == "")
+            symbol = _Symbol;
+        
+        double point = SymbolInfoDouble(symbol, SYMBOL_POINT);
+        double pipSize = 0;
+        
+        // Special handling for different symbol types
+        if(StringFind(symbol, "XAU") >= 0) // Gold
+        {
+            pipSize = point * 10; // Gold uses 10 * point for pip
+        }
+        else if(StringFind(symbol, "XAG") >= 0) // Silver
+        {
+            pipSize = point * 10; // Silver uses 10 * point for pip
+        }
+        else if(StringFind(symbol, "JPY") >= 0) // JPY pairs
+        {
+            pipSize = point * 100; // JPY pairs use 100 * point for pip
+        }
+        else // Other forex pairs
+        {
+            pipSize = point * 10; // Standard forex pairs use 10 * point for pip
+        }
+        
+        return pipSize;
     }
     
     //+------------------------------------------------------------------+

@@ -16,7 +16,7 @@ The Ultimate Forex EA God Mode now includes comprehensive support for mini contr
 - **NZDUSDm** - New Zealand Dollar/US Dollar Mini
 
 ### Commodities
-- **XAUUSDm** - Gold/US Dollar Mini
+- **XAUUSDm** - Gold/US Dollar Mini (requires 50+ pips SL, 25+ pips TP)
 - **XAGUSDm** - Silver/US Dollar Mini
 - **WTIUSDm** - West Texas Intermediate Mini
 
@@ -36,6 +36,7 @@ The Ultimate Forex EA God Mode now includes comprehensive support for mini contr
 - **Adjusted Thresholds**: Profit and loss thresholds are reduced for mini contracts
 - **Correlation Detection**: Enhanced correlation detection between mini and standard contracts
 - **Volatility Handling**: Adjusted volatility multipliers for mini contracts
+- **Spread Tolerance**: Doubled spread limit for mini contracts (20 pips vs 10 pips)
 
 ### 4. Strategy Adaptations
 All trading strategies automatically adapt to mini contracts:
@@ -85,6 +86,7 @@ Mini contracts automatically use adjusted risk parameters:
 - Maximum positions: 3x normal limit
 - Profit thresholds: 50% of standard
 - Loss thresholds: 50% of standard
+- Spread tolerance: 2x normal limit (20 pips vs 10 pips)
 
 ## Implementation Details
 

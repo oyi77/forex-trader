@@ -351,7 +351,7 @@ private:
                              SymbolInfoDouble(symbol, SYMBOL_BID) : 
                              SymbolInfoDouble(symbol, SYMBOL_ASK);
         
-        double pipSize = SymbolInfoDouble(symbol, SYMBOL_POINT) * 10;
+        double pipSize = GetPipSize(symbol);
         double profitPips = MathAbs(currentPrice - openPrice) / pipSize;
         
         if(profitPips >= m_partialCloseProfitPips && currentProfit > 0)
@@ -385,7 +385,7 @@ private:
         double currentSL = PositionGetDouble(POSITION_SL);
         double currentTP = PositionGetDouble(POSITION_TP);
         
-        double pipSize = SymbolInfoDouble(symbol, SYMBOL_POINT) * 10;
+        double pipSize = GetPipSize(symbol);
         double trailDistance = m_trailingStopPips * pipSize;
         double stepDistance = m_trailingStepPips * pipSize;
         
@@ -423,6 +423,36 @@ private:
                       " | New SL: ", newSL);
             }
         }
+    }
+    
+    //--- Get proper pip size for symbol
+    double GetPipSize(string symbol)
+    {
+        if(symbol == "")
+            symbol = _Symbol;
+        
+        double point = SymbolInfoDouble(symbol, SYMBOL_POINT);
+        double pipSize = 0;
+        
+        // Special handling for different symbol types
+        if(StringFind(symbol, "XAU") >= 0) // Gold
+        {
+            pipSize = point * 10; // Gold uses 10 * point for pip
+        }
+        else if(StringFind(symbol, "XAG") >= 0) // Silver
+        {
+            pipSize = point * 10; // Silver uses 10 * point for pip
+        }
+        else if(StringFind(symbol, "JPY") >= 0) // JPY pairs
+        {
+            pipSize = point * 100; // JPY pairs use 100 * point for pip
+        }
+        else // Other forex pairs
+        {
+            pipSize = point * 10; // Standard forex pairs use 10 * point for pip
+        }
+        
+        return pipSize;
     }
     
     //--- Check if symbol is a mini contract

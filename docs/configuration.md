@@ -118,8 +118,8 @@ position_management:
 ### Stop Loss & Take Profit
 ```yaml
 stop_loss_take_profit:
-  default_stop_loss_pips: 20.0     # Default stop loss
-  default_take_profit_pips: 5.0    # Default take profit
+  default_stop_loss_pips: 50.0     # Default stop loss (adjusted for gold)
+  default_take_profit_pips: 25.0   # Default take profit (adjusted for gold)
   use_dynamic_sltp: true           # Use dynamic SL/TP
   sl_multiplier: 0.5               # Stop loss multiplier
   tp_multiplier: 0.3               # Take profit multiplier
@@ -135,7 +135,7 @@ filters:
   start_hour: 0                   # Start hour (0-23)
   end_hour: 23                    # End hour (0-23)
   allowed_symbols: "EURUSD,GBPUSD,USDJPY,USDCHF,USDCAD,AUDUSD,NZDUSD,XAUUSD,XAGUSD,WTIUSD,EURUSDm,GBPUSDm,USDJPYm,USDCHFm,USDCADm,AUDUSDm,NZDUSDm,XAUUSDm,XAGUSDm,WTIUSDm"
-  max_spread_pips: 10.0           # Maximum spread
+  max_spread_pips: 20.0           # Maximum spread (doubled for mini contracts)
   use_correlation_filter: true     # Enable correlation filter
   max_correlation: 0.8            # Maximum correlation
 ```

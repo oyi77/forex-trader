@@ -147,7 +147,7 @@ public:
         double leveragedRisk = adjustedRisk * (m_leverage / 100.0);
         
         // Calculate position size
-        double pipValue = SymbolInfoDouble(symbol, SYMBOL_TRADE_TICK_VALUE);
+        double pipValue = GetPipValue(symbol);
         if(pipValue == 0) pipValue = 1.0; // Fallback
         
         // Mini contract adjustment
@@ -160,7 +160,7 @@ public:
             Print("Mini contract detected: ", symbol, " | Multiplier: ", miniContractMultiplier);
         }
         
-        double positionSize = leveragedRisk / (stopLossPips * pipValue * 10);
+        double positionSize = leveragedRisk / (stopLossPips * pipValue);
         
         // Apply position limits
         double minLot = SymbolInfoDouble(symbol, SYMBOL_VOLUME_MIN);
@@ -181,9 +181,9 @@ public:
         positionSize = MathRound(positionSize / lotStep) * lotStep;
         
         // Final safety check
-        if(positionSize * pipValue * stopLossPips * 10 > m_currentBalance * (m_maxAccountRisk / 100.0))
+        if(positionSize * pipValue * stopLossPips > m_currentBalance * (m_maxAccountRisk / 100.0))
         {
-            positionSize = (m_currentBalance * (m_maxAccountRisk / 100.0)) / (pipValue * stopLossPips * 10);
+            positionSize = (m_currentBalance * (m_maxAccountRisk / 100.0)) / (pipValue * stopLossPips);
             positionSize = MathRound(positionSize / lotStep) * lotStep;
         }
         
@@ -205,51 +205,73 @@ public:
         // Update daily tracking
         UpdateDailyTracking();
         
-        // Check daily loss limit
-        if(m_todayLoss > m_currentBalance * (m_dailyLossLimit / 100.0))
-        {
-            Print("Daily loss limit reached: ", m_todayLoss);
-            return false;
-        }
-        
-        // Check maximum drawdown
-        if(m_currentDrawdown > m_maxDrawdown)
-        {
-            Print("Maximum drawdown exceeded: ", m_currentDrawdown, "%");
-            m_emergencyStop = true;
-            return false;
-        }
-        
-        // Check position limits
-        if(m_currentPositions >= m_maxPositions)
-        {
-            Print("Maximum positions reached: ", m_currentPositions);
-            return false;
-        }
-        
-        // Check total exposure
-        if(m_totalExposure > m_currentBalance * (m_maxAccountRisk / 100.0))
-        {
-            Print("Maximum exposure reached: ", m_totalExposure);
-            return false;
-        }
-        
-        // Check consecutive losses
-        if(m_consecutiveLosses >= m_maxConsecutiveLosses)
-        {
-            Print("Too many consecutive losses: ", m_consecutiveLosses);
-            return false;
-        }
-        
-        // God Mode: Allow more aggressive trading
+        // God Mode: More aggressive trading rules
         if(m_godModeEnabled)
         {
-            // Reduce restrictions when behind target
+            // God Mode: Relax most restrictions when behind target
             double currentDailyReturn = GetCurrentDailyReturn();
-            if(currentDailyReturn < m_targetDailyReturn * 0.3) // If less than 30% of target
+            if(currentDailyReturn < m_targetDailyReturn * 0.5) // If less than 50% of target
             {
-                Print("God Mode: Relaxing restrictions - Behind target");
-                return true; // Override most restrictions
+                Print("God Mode: Relaxing restrictions - Behind target (", currentDailyReturn, "% vs ", m_targetDailyReturn, "%)");
+                
+                // Only check emergency stop and position limits in God Mode
+                if(m_currentPositions >= m_maxPositions)
+                {
+                    Print("Maximum positions reached: ", m_currentPositions);
+                    return false;
+                }
+                
+                return true; // Override most restrictions in God Mode
+            }
+            
+            // Even if ahead of target, be more aggressive
+            if(m_currentPositions >= m_maxPositions)
+            {
+                Print("Maximum positions reached: ", m_currentPositions);
+                return false;
+            }
+            
+            // Allow higher exposure in God Mode
+            if(m_totalExposure > m_currentBalance * (m_maxAccountRisk * 1.5 / 100.0))
+            {
+                Print("Maximum exposure reached (God Mode): ", m_totalExposure);
+                return false;
+            }
+            
+            return true;
+        }
+        else
+        {
+            // Conservative mode - original restrictions
+            if(m_todayLoss > m_currentBalance * (m_dailyLossLimit / 100.0))
+            {
+                Print("Daily loss limit reached: ", m_todayLoss);
+                return false;
+            }
+            
+            if(m_currentDrawdown > m_maxDrawdown)
+            {
+                Print("Maximum drawdown exceeded: ", m_currentDrawdown, "%");
+                m_emergencyStop = true;
+                return false;
+            }
+            
+            if(m_currentPositions >= m_maxPositions)
+            {
+                Print("Maximum positions reached: ", m_currentPositions);
+                return false;
+            }
+            
+            if(m_totalExposure > m_currentBalance * (m_maxAccountRisk / 100.0))
+            {
+                Print("Maximum exposure reached: ", m_totalExposure);
+                return false;
+            }
+            
+            if(m_consecutiveLosses >= m_maxConsecutiveLosses)
+            {
+                Print("Too many consecutive losses: ", m_consecutiveLosses);
+                return false;
             }
         }
         
@@ -262,7 +284,7 @@ public:
     double CalculateDynamicStopLoss(ENUM_ORDER_TYPE orderType, double entryPrice, 
                                    double atr, double baseSLPips, string symbol)
     {
-        double pipSize = SymbolInfoDouble(symbol, SYMBOL_POINT) * 10;
+        double pipSize = GetPipSize(symbol);
         
         // Base stop loss
         double stopLossPips = baseSLPips;
@@ -302,7 +324,7 @@ public:
     double CalculateDynamicTakeProfit(ENUM_ORDER_TYPE orderType, double entryPrice, 
                                      double stopLoss, double atr, double baseTPPips, string symbol)
     {
-        double pipSize = SymbolInfoDouble(symbol, SYMBOL_POINT) * 10;
+        double pipSize = GetPipSize(symbol);
         
         // Calculate stop loss distance
         double slDistance = MathAbs(entryPrice - stopLoss);
@@ -473,6 +495,23 @@ public:
     }
     
     //+------------------------------------------------------------------+
+    //| Force reset emergency stop for God Mode                         |
+    //+------------------------------------------------------------------+
+    void ForceResetEmergencyStop()
+    {
+        if(m_godModeEnabled)
+        {
+            m_emergencyStop = false;
+            Print("GOD MODE: Emergency stop force reset - Extreme trading resumed");
+            Alert("GOD MODE: Emergency stop reset - Trading resumed");
+        }
+        else
+        {
+            Print("Force reset only available in God Mode");
+        }
+    }
+    
+    //+------------------------------------------------------------------+
     //| Print risk statistics                                           |
     //+------------------------------------------------------------------+
     void PrintRiskStatistics()
@@ -566,6 +605,62 @@ private:
     }
     
     //+------------------------------------------------------------------+
+    //| Get pip value for symbol                                         |
+    //+------------------------------------------------------------------+
+    double GetPipValue(string symbol)
+    {
+        if(symbol == "")
+            symbol = _Symbol;
+        
+        double tickValue = SymbolInfoDouble(symbol, SYMBOL_TRADE_TICK_VALUE);
+        double tickSize = SymbolInfoDouble(symbol, SYMBOL_TRADE_TICK_SIZE);
+        double point = SymbolInfoDouble(symbol, SYMBOL_POINT);
+        
+        double pipSize = GetPipSize(symbol);
+        double pipValue = (tickValue / tickSize) * pipSize;
+        
+        // Mini contract adjustment
+        if(IsMiniContract(symbol))
+        {
+            pipValue *= 0.1; // Mini contracts have 0.1x the value
+        }
+        
+        return pipValue;
+    }
+    
+    //+------------------------------------------------------------------+
+    //| Get proper pip size for symbol                                   |
+    //+------------------------------------------------------------------+
+    double GetPipSize(string symbol)
+    {
+        if(symbol == "")
+            symbol = _Symbol;
+        
+        double point = SymbolInfoDouble(symbol, SYMBOL_POINT);
+        double pipSize = 0;
+        
+        // Special handling for different symbol types
+        if(StringFind(symbol, "XAU") >= 0) // Gold
+        {
+            pipSize = point * 10; // Gold uses 10 * point for pip
+        }
+        else if(StringFind(symbol, "XAG") >= 0) // Silver
+        {
+            pipSize = point * 10; // Silver uses 10 * point for pip
+        }
+        else if(StringFind(symbol, "JPY") >= 0) // JPY pairs
+        {
+            pipSize = point * 100; // JPY pairs use 100 * point for pip
+        }
+        else // Other forex pairs
+        {
+            pipSize = point * 10; // Standard forex pairs use 10 * point for pip
+        }
+        
+        return pipSize;
+    }
+    
+    //+------------------------------------------------------------------+
     //| Check if symbol is a mini contract                               |
     //+------------------------------------------------------------------+
     bool IsMiniContract(string symbol)
@@ -619,28 +714,56 @@ private:
     //+------------------------------------------------------------------+
     void CheckEmergencyConditions()
     {
-        // Check for catastrophic loss
-        if(m_currentBalance < m_initialBalance * 0.1) // 90% loss
+        // God Mode: More aggressive thresholds for extreme returns
+        if(m_godModeEnabled)
         {
-            m_emergencyStop = true;
-            Print("EMERGENCY STOP: Catastrophic loss detected");
-            Alert("EMERGENCY STOP: Account down 90%");
+            // Only stop if account is completely blown (95% loss)
+            if(m_currentBalance < m_initialBalance * 0.05) // 95% loss
+            {
+                m_emergencyStop = true;
+                Print("EMERGENCY STOP: Catastrophic loss detected (God Mode)");
+                Alert("EMERGENCY STOP: Account down 95%");
+            }
+            
+            // Allow extreme drawdown in God Mode (90% drawdown)
+            if(m_currentDrawdown > 90.0) // 90% drawdown
+            {
+                m_emergencyStop = true;
+                Print("EMERGENCY STOP: Extreme drawdown detected (God Mode)");
+                Alert("EMERGENCY STOP: Drawdown exceeds 90%");
+            }
+            
+            // Allow extreme daily loss in God Mode (80% daily loss)
+            if(m_todayLoss > m_todayStartBalance * 0.8) // 80% daily loss
+            {
+                m_emergencyStop = true;
+                Print("EMERGENCY STOP: Excessive daily loss (God Mode)");
+                Alert("EMERGENCY STOP: Daily loss exceeds 80%");
+            }
         }
-        
-        // Check for extreme drawdown
-        if(m_currentDrawdown > 80.0) // 80% drawdown
+        else
         {
-            m_emergencyStop = true;
-            Print("EMERGENCY STOP: Extreme drawdown detected");
-            Alert("EMERGENCY STOP: Drawdown exceeds 80%");
-        }
-        
-        // Check for excessive daily loss
-        if(m_todayLoss > m_todayStartBalance * 0.5) // 50% daily loss
-        {
-            m_emergencyStop = true;
-            Print("EMERGENCY STOP: Excessive daily loss");
-            Alert("EMERGENCY STOP: Daily loss exceeds 50%");
+            // Conservative thresholds for non-God Mode
+            if(m_currentBalance < m_initialBalance * 0.1) // 90% loss
+            {
+                m_emergencyStop = true;
+                Print("EMERGENCY STOP: Catastrophic loss detected");
+                Alert("EMERGENCY STOP: Account down 90%");
+            }
+            
+            if(m_currentDrawdown > 80.0) // 80% drawdown
+            {
+                m_emergencyStop = true;
+                Print("EMERGENCY STOP: Extreme drawdown detected");
+                Alert("EMERGENCY STOP: Drawdown exceeds 80%");
+            }
+            
+            if(m_todayLoss > m_todayStartBalance * 0.5) // 50% daily loss
+            {
+                m_emergencyStop = true;
+                Print("EMERGENCY STOP: Excessive daily loss");
+                Alert("EMERGENCY STOP: Daily loss exceeds 50%");
+            }
         }
     }
 };
