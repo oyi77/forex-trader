@@ -50,6 +50,14 @@ private:
     int               m_consecutiveLosses;
     int               m_maxConsecutiveLosses;
     
+    // Win/Loss streak tracking
+    int               m_consecutiveWins;
+    double            m_winStreakMultiplier;
+    double            m_lossStreakDivisor;
+    
+    // Debug settings
+    bool              m_enableDetailedLogging;
+    
 public:
     //--- Constructor
     CGodModeRiskManager(double initialBalance, double targetDaily, double maxRisk, 
@@ -88,6 +96,14 @@ public:
         m_consecutiveLosses = 0;
         m_maxConsecutiveLosses = 5;
         
+        // Initialize win/loss streak tracking
+        m_consecutiveWins = 0;
+        m_winStreakMultiplier = 1.0;
+        m_lossStreakDivisor = 1.0;
+        
+        // Initialize debug settings
+        m_enableDetailedLogging = true;
+        
         Print("God Mode Risk Manager initialized - Target: ", targetDaily, "% daily");
     }
     
@@ -110,21 +126,25 @@ public:
         // Base risk calculation
         double baseRisk = m_currentBalance * (riskPercent / 100.0);
         
-        // God Mode multiplier
+        // God Mode multiplier - Optimized for 2B target
         double godModeMultiplier = 1.0;
         if(m_godModeEnabled)
         {
-            // Extreme multiplier based on target return
-            godModeMultiplier = 1.0 + (m_targetDailyReturn / 100.0);
+            // Extreme multiplier based on target return - Increased for 2B target
+            godModeMultiplier = 1.0 + (m_targetDailyReturn / 50.0); // More aggressive
             
-            // Additional boost for high confidence
+            // Additional boost for high confidence - Increased
             if(confidence > 80)
-                godModeMultiplier *= 1.2;
+                godModeMultiplier *= 1.5; // Increased from 1.2
             
-            // Desperation multiplier if behind target
+            // Desperation multiplier if behind target - More aggressive
             double currentDailyReturn = GetCurrentDailyReturn();
             if(currentDailyReturn < m_targetDailyReturn * 0.5)
-                godModeMultiplier *= 1.5; // 50% boost if behind
+                godModeMultiplier *= 2.0; // Increased from 1.5 - 100% boost if behind
+            
+            // Additional boost for extreme targets
+            if(m_targetDailyReturn > 100.0)
+                godModeMultiplier *= 1.3; // 30% additional boost for extreme targets
         }
         
         // Confidence multiplier
@@ -214,25 +234,19 @@ public:
             {
                 Print("God Mode: Relaxing restrictions - Behind target (", currentDailyReturn, "% vs ", m_targetDailyReturn, "%)");
                 
-                // Only check emergency stop and position limits in God Mode
-                if(m_currentPositions >= m_maxPositions)
-                {
-                    Print("Maximum positions reached: ", m_currentPositions);
-                    return false;
-                }
-                
+                // Only check emergency stop in God Mode when behind target
                 return true; // Override most restrictions in God Mode
             }
             
             // Even if ahead of target, be more aggressive
-            if(m_currentPositions >= m_maxPositions)
+            if(m_currentPositions >= m_maxPositions * 2) // Double the position limit in God Mode
             {
-                Print("Maximum positions reached: ", m_currentPositions);
+                Print("Maximum positions reached (God Mode): ", m_currentPositions);
                 return false;
             }
             
             // Allow higher exposure in God Mode
-            if(m_totalExposure > m_currentBalance * (m_maxAccountRisk * 1.5 / 100.0))
+            if(m_totalExposure > m_currentBalance * (m_maxAccountRisk * 2.0 / 100.0)) // Double exposure limit
             {
                 Print("Maximum exposure reached (God Mode): ", m_totalExposure);
                 return false;
@@ -426,28 +440,65 @@ public:
     }
     
     //+------------------------------------------------------------------+
-    //| Record trade result for risk tracking                           |
+    //| Set debug logging                                               |
+    //+------------------------------------------------------------------+
+    void SetDebugLogging(bool enable)
+    {
+        m_enableDetailedLogging = enable;
+    }
+    
+    //+------------------------------------------------------------------+
+    //| Update position count from market                              |
+    //+------------------------------------------------------------------+
+    void UpdatePositionCount()
+    {
+        m_currentPositions = 0;
+        m_totalExposure = 0.0;
+        
+        for(int i = 0; i < PositionsTotal(); i++)
+        {
+            if(PositionGetSymbol(i) != "")
+            {
+                m_currentPositions++;
+                m_totalExposure += PositionGetDouble(POSITION_VOLUME) * 
+                                  PositionGetDouble(POSITION_PRICE_OPEN);
+            }
+        }
+        
+        if(m_enableDetailedLogging)
+        {
+            Print("DEBUG: Position count updated - Current: ", m_currentPositions, 
+                  " Max: ", m_maxPositions, " Exposure: ", m_totalExposure);
+        }
+    }
+    
+    //+------------------------------------------------------------------+
+    //| Record trade result for statistics                             |
     //+------------------------------------------------------------------+
     void RecordTradeResult(double profit, bool isWin)
     {
-        // Update daily tracking
-        if(profit > 0)
-            m_todayProfit += profit;
-        else
-            m_todayLoss += MathAbs(profit);
-        
-        // Update consecutive losses
         if(isWin)
+        {
+            m_consecutiveWins++;
             m_consecutiveLosses = 0;
+        }
         else
+        {
             m_consecutiveLosses++;
+            m_consecutiveWins = 0;
+        }
         
-        // Update balance and drawdown
-        UpdateBalance();
-        UpdateDrawdown();
+        // Update win streak multiplier
+        if(m_consecutiveWins > 0)
+            m_winStreakMultiplier = MathMin(2.0, 1.0 + (m_consecutiveWins * 0.1));
+        else
+            m_winStreakMultiplier = 1.0;
         
-        // Check for emergency conditions
-        CheckEmergencyConditions();
+        // Update loss streak divisor
+        if(m_consecutiveLosses > 0)
+            m_lossStreakDivisor = MathMax(0.5, 1.0 - (m_consecutiveLosses * 0.1));
+        else
+            m_lossStreakDivisor = 1.0;
     }
     
     //+------------------------------------------------------------------+
@@ -478,7 +529,7 @@ public:
     }
     
     //+------------------------------------------------------------------+
-    //| Check if emergency stop should be activated                     |
+    //| Check if emergency stop is active                              |
     //+------------------------------------------------------------------+
     bool IsEmergencyStop()
     {
@@ -495,19 +546,14 @@ public:
     }
     
     //+------------------------------------------------------------------+
-    //| Force reset emergency stop for God Mode                         |
+    //| Force reset emergency stop (God Mode only)                     |
     //+------------------------------------------------------------------+
     void ForceResetEmergencyStop()
     {
         if(m_godModeEnabled)
         {
             m_emergencyStop = false;
-            Print("GOD MODE: Emergency stop force reset - Extreme trading resumed");
-            Alert("GOD MODE: Emergency stop reset - Trading resumed");
-        }
-        else
-        {
-            Print("Force reset only available in God Mode");
+            Print("GOD MODE: Emergency stop force reset");
         }
     }
     
