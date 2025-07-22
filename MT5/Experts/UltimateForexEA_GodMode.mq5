@@ -49,11 +49,11 @@ enum ENUM_RISK_LEVEL
 
 input group "=== GOD MODE SETTINGS ==="
 input bool     EnableGodMode = true;           // Enable God Mode (EXTREME RISK)
-input ENUM_RISK_LEVEL RiskLevel = RISK_GOD_MODE; // Risk Level
+input ENUM_RISK_LEVEL RiskLevel = RISK_MODERATE; // Risk Level
 input double   TargetDailyReturn = 200.0;      // Target Daily Return (%) - Optimized for 2B target
-input double   MaxAccountRisk = 98.0;          // Maximum Account Risk (%) - Increased for extreme target
-input bool     UseExtremePositionSizing = true; // Use Extreme Position Sizing
-input bool     EnableForcedTrading = true;     // Enable forced trades for extreme target
+input double   MaxAccountRisk = 5.0;          // Maximum Account Risk (%) - Reduced for conservative trading
+input bool     UseExtremePositionSizing = false; // Use Extreme Position Sizing
+input bool     EnableForcedTrading = false;     // Enable forced trades for extreme target
 
 input group "=== ACCOUNT & BROKER SETTINGS ==="
 input double   InitialBalance = 1000000.0;     // Initial Balance (IDR)
@@ -72,7 +72,7 @@ input bool     EnableNewsImpact = true;        // Enable News Impact
 input bool     EnableGridRecovery = true;      // Enable Grid Recovery
 
 input group "=== GOD MODE SCALPING PARAMETERS ==="
-input double   ScalpRiskPerTrade = 95.0;       // Scalp Risk per Trade (%) - Increased for extreme target
+input double   ScalpRiskPerTrade = 2.0;        // Scalp Risk per Trade (%) - Reduced for conservative trading
 input double   ScalpMinPipMovement = 0.05;     // Minimum Pip Movement - Reduced for more trades
 input int      ScalpMaxHoldTime = 30;          // Max Hold Time (seconds) - Reduced for faster turnover
 input int      ScalpRSIPeriod = 2;             // RSI Period - More sensitive
@@ -81,7 +81,7 @@ input int      ScalpEMASlow = 3;               // Slow EMA Period - More sensiti
 input double   ScalpConfidenceThreshold = 30.0; // Confidence Threshold - Lower for more trades
 
 input group "=== EXTREME RSI PARAMETERS ==="
-input double   ExtremeRSIRisk = 90.0;          // Extreme RSI Risk (%) - Increased
+input double   ExtremeRSIRisk = 2.0;           // Extreme RSI Risk (%) - Reduced for conservative trading
 input int      ExtremeRSIPeriod = 3;           // RSI Period - More sensitive
 input double   ExtremeOversold = 10.0;         // Extreme Oversold Level - More extreme
 input double   ExtremeOverbought = 90.0;       // Extreme Overbought Level - More extreme
@@ -89,14 +89,14 @@ input double   RSIConfidenceBoost = 35.0;      // Confidence Boost - Increased
 input bool     UseRSIDivergence = true;        // Use RSI Divergence
 
 input group "=== VOLATILITY EXPLOSION PARAMETERS ==="
-input double   VolatilityRisk = 95.0;          // Volatility Risk (%) - Increased
+input double   VolatilityRisk = 2.0;           // Volatility Risk (%) - Reduced for conservative trading
 input double   VolatilityThreshold = 1.5;      // Volatility Threshold - Lower for more signals
 input int      VolatilityLookback = 3;         // Volatility Lookback - Shorter
 input double   ExplosionMultiplier = 4.0;      // Explosion Multiplier - Increased
 input bool     UseVolatilityFilter = false;    // Use Volatility Filter - Disabled for more trades
 
 input group "=== MOMENTUM SURGE PARAMETERS ==="
-input double   MomentumRisk = 90.0;            // Momentum Risk (%) - Increased
+input double   MomentumRisk = 2.0;             // Momentum Risk (%) - Reduced for conservative trading
 input int      MACDFast = 3;                   // MACD Fast Period - More sensitive
 input int      MACDSlow = 7;                   // MACD Slow Period - More sensitive
 input int      MACDSignal = 2;                 // MACD Signal Period - More sensitive
@@ -104,14 +104,14 @@ input double   MomentumThreshold = 0.00005;    // Momentum Threshold - Lower for
 input bool     UseMomentumFilter = false;      // Use Momentum Filter - Disabled for more trades
 
 input group "=== NEWS IMPACT PARAMETERS ==="
-input double   NewsRisk = 98.0;                // News Risk (%) - Increased
+input double   NewsRisk = 2.0;                 // News Risk (%) - Reduced for conservative trading
 input double   NewsVolatilityMultiplier = 3.0; // News Volatility Multiplier - Increased
 input int      NewsLookbackBars = 2;           // News Lookback Bars - Shorter
 input bool     TradeOnNewsOnly = false;        // Trade Only on News
 input string   NewsTimeRanges = "08:30-09:30,13:30-14:30,15:30-16:30,20:30-21:30"; // Extended News Times
 
 input group "=== GRID RECOVERY PARAMETERS ==="
-input double   GridRisk = 85.0;                // Grid Risk (%) - Increased
+input double   GridRisk = 2.0;                 // Grid Risk (%) - Reduced for conservative trading
 input double   GridSpacing = 5.0;              // Grid Spacing (pips) - Tighter
 input int      MaxGridLevels = 15;             // Maximum Grid Levels - Increased
 input double   GridMultiplier = 2.0;           // Grid Multiplier - Increased
@@ -120,13 +120,13 @@ input bool     UseGridRecovery = true;         // Use Grid Recovery
 input group "=== POSITION MANAGEMENT ==="
 input int      MaxPositions = 50;              // Maximum Positions - Increased for extreme target
 input int      MaxPositionsPerStrategy = 10;   // Max Positions per Strategy - Increased
-input double   PositionSizeMultiplier = 2.0;   // Position Size Multiplier - Increased
+input double   PositionSizeMultiplier = 1.0;   // Position Size Multiplier - Adjusted for conservative trading
 input bool     UseCompounding = true;          // Use Compounding
 input double   CompoundingFactor = 1.5;        // Compounding Factor - Increased
 
 input group "=== STOP LOSS & TAKE PROFIT ==="
-input double   DefaultStopLossPips = 10.0;     // Default Stop Loss (pips) - Tighter
-input double   DefaultTakeProfitPips = 3.0;    // Default Take Profit (pips) - Tighter
+input double   DefaultStopLossPips = 30.0;     // Default Stop Loss (pips) - Adjusted for better risk management
+input double   DefaultTakeProfitPips = 15.0;   // Default Take Profit (pips) - Adjusted for better risk management
 input bool     UseDynamicSLTP = true;          // Use Dynamic SL/TP
 input double   SLMultiplier = 0.3;             // Stop Loss Multiplier - Tighter
 input double   TPMultiplier = 0.2;             // Take Profit Multiplier - Tighter
@@ -1400,9 +1400,9 @@ void CheckTradingSignals()
     if(EnableGridRecovery && GetStrategyPositions("Grid_Recovery") < MaxPositionsPerStrategy)
         CheckGridRecoverySignal();
     
-    // 2B Target Strategy
-    if(EnableForcedTrading && GetStrategyPositions("2B_Target") < MaxPositionsPerStrategy)
-        Check2BTargetStrategySignal();
+    // 2B Target Strategy - DISABLED FOR CONSERVATIVE TRADING
+    // if(EnableForcedTrading && GetStrategyPositions("2B_Target") < MaxPositionsPerStrategy)
+    //     Check2BTargetStrategySignal();
     
     // Debug: Log if no signals were generated
     if(EnableDetailedLogging && PositionsTotal() == 0)
@@ -1436,31 +1436,25 @@ void CheckGodModeScalpingSignal()
     string signal = "";
     double confidence = 0;
     
-    // Ultra-aggressive buy conditions - Optimized for 2B target
-    if(currentRSI < 45 || 
-       currentPrice < bbLowerCurrent * 1.002 ||
-       currentEMAFast > currentEMASlow * 1.00005 ||
-       currentPrice < currentEMASlow * 0.9995) // Added trend condition
+    // More conservative buy conditions
+    if(currentRSI < 30 && currentEMAFast > currentEMASlow && currentPrice < bbMiddle[0])
     {
         signal = "BUY";
-        confidence = 80 + MathRand() % 20; // 80-100% - Higher confidence
+        confidence = 70 + MathRand() % 10; // 70-80%
     }
-    // Ultra-aggressive sell conditions - Optimized for 2B target
-    else if(currentRSI > 55 ||
-            currentPrice > bbUpperCurrent * 0.998 ||
-            currentEMAFast < currentEMASlow * 0.99995 ||
-            currentPrice > currentEMASlow * 1.0005) // Added trend condition
+    // More conservative sell conditions
+    else if(currentRSI > 70 && currentEMAFast < currentEMASlow && currentPrice > bbMiddle[0])
     {
         signal = "SELL";
-        confidence = 80 + MathRand() % 20; // 80-100% - Higher confidence
+        confidence = 70 + MathRand() % 10; // 70-80%
     }
     
-    // Force signal if none (desperation mode) - Increased for 2B target
-    if(signal == "" && MathRand() % 100 < 60) // 60% chance - Increased for more trades
-    {
-        signal = (MathRand() % 2 == 0) ? "BUY" : "SELL";
-        confidence = 70 + MathRand() % 26; // 70-95% - Higher confidence
-    }
+    // Remove forced signal for more conservative trading
+    // if(signal == "" && MathRand() % 100 < 60) // 60% chance - Increased for more trades
+    // {
+    //     signal = (MathRand() % 2 == 0) ? "BUY" : "SELL";
+    //     confidence = 70 + MathRand() % 26; // 70-95% - Higher confidence
+    // }
     
     if(signal != "" && confidence >= ScalpConfidenceThreshold)
     {
@@ -1517,17 +1511,17 @@ void CheckExtremeRSISignal()
     string signal = "";
     double confidence = 0;
     
-    // Extreme oversold (BUY)
-    if(currentRSI < ExtremeOversold && previousRSI >= ExtremeOversold)
+    // More conservative oversold (BUY)
+    if(currentRSI < ExtremeOversold && previousRSI >= ExtremeOversold && iClose(_Symbol, PERIOD_CURRENT, 0) > iOpen(_Symbol, PERIOD_CURRENT, 0))
     {
         signal = "BUY";
-        confidence = 85 + RSIConfidenceBoost;
+        confidence = 75 + RSIConfidenceBoost; // Reduced confidence boost
     }
-    // Extreme overbought (SELL)
-    else if(currentRSI > ExtremeOverbought && previousRSI <= ExtremeOverbought)
+    // More conservative overbought (SELL)
+    else if(currentRSI > ExtremeOverbought && previousRSI <= ExtremeOverbought && iClose(_Symbol, PERIOD_CURRENT, 0) < iOpen(_Symbol, PERIOD_CURRENT, 0))
     {
         signal = "SELL";
-        confidence = 85 + RSIConfidenceBoost;
+        confidence = 75 + RSIConfidenceBoost; // Reduced confidence boost
     }
     
     if(signal != "" && confidence >= 70)
@@ -1560,14 +1554,14 @@ void CheckVolatilityExplosionSignal()
         avgATR += atrValues[i];
     avgATR /= VolatilityLookback;
     
-    // Check for volatility explosion
-    if(currentATR > avgATR * VolatilityThreshold * ExplosionMultiplier)
+    // Check for volatility explosion with price confirmation
+    string signal = "";
+    double confidence = 80; // Reduced confidence
+    
+    if(currentATR > avgATR * VolatilityThreshold)
     {
         double currentPrice = SymbolInfoDouble(_Symbol, SYMBOL_BID);
         double previousPrice = iClose(_Symbol, PERIOD_CURRENT, 1);
-        
-        string signal = "";
-        double confidence = 90;
         
         // Trade in direction of price movement
         if(currentPrice > previousPrice)
@@ -1642,13 +1636,13 @@ void CheckNewsImpactSignal()
     double currentATR = atrValues[0];
     double avgATR = (atrValues[1] + atrValues[2] + atrValues[3]) / 3;
     
-    if(currentATR > avgATR * NewsVolatilityMultiplier)
+    if(currentATR > avgATR * (NewsVolatilityMultiplier * 0.5)) // Reduced multiplier
     {
         double currentPrice = SymbolInfoDouble(_Symbol, SYMBOL_BID);
         double previousPrice = iClose(_Symbol, PERIOD_CURRENT, 1);
         
         string signal = "";
-        double confidence = 95;
+        double confidence = 85; // Reduced confidence
         
         // Trade in direction of volatility spike
         if(currentPrice > previousPrice)
@@ -2103,19 +2097,19 @@ double CalculatePositionSize(string strategy, double riskPercent, double confide
     }
     
     // Normal position sizing for adequate balances
-    double maxRiskPercent = MathMin(riskPercent, 20.0);
+    double maxRiskPercent = MathMin(riskPercent, 2.0); // Capped at 2% for conservative trading
     double riskAmount = accountValue * (maxRiskPercent / 100.0);
     double confidenceMultiplier = confidence / 100.0;
     riskAmount *= confidenceMultiplier;
     
-    if(EnableGodMode && RiskLevel == RISK_GOD_MODE)
-        riskAmount *= 1.2;
+    // if(EnableGodMode && RiskLevel == RISK_GOD_MODE)
+    //     riskAmount *= 1.2;
     
-    if(UseCompounding && stats.totalReturn > 0)
-        riskAmount *= MathMin(MathPow(CompoundingFactor, stats.totalReturn / 100.0), 2.0);
+    // if(UseCompounding && stats.totalReturn > 0)
+    //     riskAmount *= MathMin(MathPow(CompoundingFactor, stats.totalReturn / 100.0), 2.0);
     
     riskAmount *= PositionSizeMultiplier;
-    double maxRiskAmount = accountValue * 0.1;
+    double maxRiskAmount = accountValue * 0.02; // Max 2% of account value
     riskAmount = MathMin(riskAmount, maxRiskAmount);
     
     double stopLossPips = DefaultStopLossPips;
@@ -2142,14 +2136,14 @@ double CalculatePositionSize(string strategy, double riskPercent, double confide
     double minLot = SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_MIN);
     double maxLot = SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_MAX);
     double lotStep = SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_STEP);
-    double maxSafeLot = MathMin(maxLot, 10.0);
+    double maxSafeLot = MathMin(maxLot, 1.0); // Capped at 1.0 lot for safety
     
     if(IsMiniContract(_Symbol))
-        maxSafeLot = MathMin(maxSafeLot, 5.0);
+        maxSafeLot = MathMin(maxSafeLot, 0.1); // Capped at 0.1 lot for mini contracts
     
     // Adaptive: reduce lot size by 50% if in drawdown
-    if(equity < balance * 0.8)
-        lotSize *= 0.5;
+    if(equity < balance * 0.9) // Less aggressive reduction
+        lotSize *= 0.75;
     
     // Ensure lot size is within valid range
     lotSize = MathMax(minLot, MathMin(maxSafeLot, lotSize));

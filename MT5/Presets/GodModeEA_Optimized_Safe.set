@@ -1,0 +1,122 @@
+; Optimized God Mode EA Configuration - SAFE VERSION
+; This preset is designed to prevent losses while maintaining good returns
+; Target: 50% daily return (reduced from 200% for safety)
+; Risk Level: Conservative God Mode (50-70% risk instead of 80-95%)
+
+[Common]
+EnableGodMode=true
+RiskLevel=4
+TargetDailyReturn=50.0
+MaxAccountRisk=70.0
+UseExtremePositionSizing=true
+EnableForcedTrading=false
+
+[Account]
+InitialBalance=1000000.0
+Leverage=2000
+BrokerName=Exness
+CommissionPerLot=0.0
+MaxSlippagePips=5.0
+UseECNExecution=true
+
+[Strategies]
+EnableGodModeScalping=true
+EnableExtremeRSI=true
+EnableVolatilityExplosion=true
+EnableMomentumSurge=true
+EnableNewsImpact=true
+EnableGridRecovery=false
+
+[Scalping]
+ScalpRiskPerTrade=15.0
+ScalpMinPipMovement=0.1
+ScalpMaxHoldTime=60
+ScalpRSIPeriod=5
+ScalpEMAFast=3
+ScalpEMASlow=8
+ScalpConfidenceThreshold=75.0
+
+[RSI]
+ExtremeRSIRisk=20.0
+ExtremeRSIPeriod=7
+ExtremeOversold=20.0
+ExtremeOverbought=80.0
+RSIConfidenceBoost=20.0
+UseRSIDivergence=true
+
+[Volatility]
+VolatilityRisk=25.0
+VolatilityThreshold=2.0
+VolatilityLookback=5
+ExplosionMultiplier=2.0
+UseVolatilityFilter=true
+
+[Momentum]
+MomentumRisk=20.0
+MACDFast=5
+MACDSlow=13
+MACDSignal=5
+MomentumThreshold=0.0001
+UseMomentumFilter=true
+
+[News]
+NewsRisk=30.0
+NewsVolatilityMultiplier=2.0
+NewsLookbackBars=5
+TradeOnNewsOnly=false
+NewsTimeRanges=08:30-09:30,13:30-14:30,15:30-16:30,20:30-21:30
+
+[Grid]
+GridRisk=25.0
+GridSpacing=10.0
+MaxGridLevels=5
+GridMultiplier=1.5
+UseGridRecovery=false
+
+[Position]
+MaxPositions=10
+MaxPositionsPerStrategy=3
+PositionSizeMultiplier=1.0
+UseCompounding=true
+CompoundingFactor=1.1
+
+[StopLoss]
+DefaultStopLossPips=15.0
+DefaultTakeProfitPips=8.0
+UseDynamicSLTP=true
+SLMultiplier=0.5
+TPMultiplier=0.4
+UseTrailingStop=true
+TrailingStopPips=3.0
+
+[Filters]
+UseTimeFilter=true
+StartHour=2
+EndHour=22
+AllowedSymbols=EURUSDm,GBPUSDm,USDJPYm,USDCHFm,USDCADm,AUDUSDm,NZDUSDm,XAUUSDm,XAGUSDm,WTIUSDm
+MaxSpreadPips=10.0
+
+[Advanced]
+MagicNumber=777777
+TradeComment=GodMode_Optimized_Safe_EA
+EnableDetailedLogging=true
+EnableAlerts=true
+SendEmailAlerts=false
+EnableStatistics=true
+UseMultiTimeframe=true
+HigherTimeframe=3
+ForceResetEmergencyStop=false
+
+; OPTIMIZATION NOTES:
+; - Reduced risk per trade from 95% to 15%
+; - Increased stop loss from 10 to 15 pips
+; - Increased take profit from 3 to 8 pips
+; - Reduced max positions from 50 to 10
+; - Reduced max positions per strategy from 10 to 3
+; - Enabled time filter for safer trading hours
+; - Enabled volatility and momentum filters
+; - Disabled grid recovery for safety
+; - Disabled forced trading
+; - More conservative indicator periods
+; - Higher confidence thresholds
+; - Reduced position size multipliers 

@@ -247,8 +247,12 @@ def _execute_simulated_trade(pair: str, balance: float, leverage: int, day: int,
     max_risk_percentage = min(0.02 * (leverage / 100), 0.1)  # Cap at 10% max
     risk_amount = min(balance * max_risk_percentage, balance * 0.1)  # Never risk more than 10%
     
-    # Cap position size to prevent overflow
-    max_position_size = balance * 10  # Maximum 10x balance regardless of leverage
+    # Cap position size to prevent overflow - more conservative for extreme leverage
+    if leverage > 1000:
+        max_position_size = balance * 5  # Maximum 5x balance for extreme leverage
+    else:
+        max_position_size = balance * 10  # Maximum 10x balance for normal leverage
+    
     position_size = min(risk_amount * min(leverage, 100), max_position_size)
     
     # Simulate market movement with realistic bounds
@@ -268,8 +272,10 @@ def _execute_simulated_trade(pair: str, balance: float, leverage: int, day: int,
         # Loser: Lose only the risk amount, not more
         pnl = -min(risk_amount, balance * 0.05)  # Cap loss at 5% of balance
     
-    # Ensure PnL doesn't cause overflow or NaN
-    pnl = max(min(pnl, balance * 2), -balance * 0.95)  # Cap gains at 200%, losses at 95%
+    # Ensure PnL doesn't cause overflow or NaN - more conservative limits
+    max_gain = balance * 0.5  # Cap gains at 50% of balance
+    max_loss = balance * 0.3  # Cap losses at 30% of balance
+    pnl = max(min(pnl, max_gain), -max_loss)
     
     # Calculate new balance with safety checks
     new_balance = balance + pnl
