@@ -137,7 +137,6 @@ config/live_credentials.yaml
 *.ex4
 *.ex5
 *.mq4
-*.mq5
 
 # Temporary files
 *.tmp
